@@ -1,0 +1,22 @@
+{
+  "expo": {
+    "name": "Project Theia",
+    "slug": "project-theia",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.projecttheia.app",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Project Theia needs camera access to photograph inventory boxes.",
+        "NSPhotoLibraryUsageDescription": "Project Theia needs photo library access to upload inventory images."
+      }
+    },
+    "plugins": [
+      "expo-camera",
+      "expo-image-picker",
+      "expo-media-library"
+    ]
+  }
+}

@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+.env
+venv/
+.venv/
+*.egg-info/
+dist/
+build/
+
+# Node / React Native
+node_modules/
+.expo/
+dist/
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+web-build/
+.expo-shared/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# AWS
+.aws/
