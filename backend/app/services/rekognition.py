@@ -1,8 +1,15 @@
 import boto3
+from rapidfuzz import process
+import json
 import os
+from pathlib import Path
 from typing import List
 
 _client = None
+_products: List[str] | None = None
+
+_PRODUCTS_PATH = Path(__file__).parent.parent.parent / "products.json"
+_MATCH_CUTOFF = 0.75
 
 
 def _get_client():
@@ -13,6 +20,21 @@ def _get_client():
             region_name=os.getenv("AWS_REGION", "us-east-1"),
         )
     return _client
+
+
+def _get_products() -> List[str]:
+    global _products
+    if _products is None:
+        _products = json.loads(_PRODUCTS_PATH.read_text()) if _PRODUCTS_PATH.exists() else []
+    return _products
+
+
+def _normalize(label: str) -> str:
+    products = _get_products()
+    if not products:
+        return label
+    match = process.extractOne(label, products, score_cutoff=_MATCH_CUTOFF * 100)
+    return match[0] if match else label
 
 
 def detect_box_labels(image_bytes: bytes) -> List[str]:
@@ -31,6 +53,4 @@ def detect_box_labels(image_bytes: bytes) -> List[str]:
         if detection["Type"] == "LINE" and detection["Confidence"] >= 80.0
     ]
 
-    # TODO: add product-name normalization here (fuzzy match against a known
-    # product list) so minor OCR variations don't create duplicate entries.
-    return labels
+    return [_normalize(label) for label in labels]
