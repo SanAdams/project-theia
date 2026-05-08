@@ -30,3 +30,7 @@ web-build/
 
 # AWS
 .aws/
+
+# Claude Code
+.claude/
+CLAUDE.md
