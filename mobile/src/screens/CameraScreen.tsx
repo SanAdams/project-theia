@@ -52,8 +52,9 @@ export default function CameraScreen() {
     try {
       const { items, total_boxes } = await scanImage(uri);
       navigation.navigate('Results', { items, total: total_boxes });
-    } catch {
-      Alert.alert('Error', 'Failed to process image. Please try again.');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      Alert.alert('Error', `Failed to process image: ${msg}`);
     } finally {
       setLoading(false);
     }
