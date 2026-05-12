@@ -3,10 +3,10 @@ from rapidfuzz import process
 import json
 import os
 from pathlib import Path
-from typing import List
+from typing import List, Dict, Any
 
 _client = None
-_products: List[str] | None = None
+_products: List[Dict[str, Any]] | None = None
 
 _PRODUCTS_PATH = Path(__file__).parent.parent.parent / "products.json"
 _MATCH_CUTOFF = 0.75
@@ -22,10 +22,15 @@ def _get_client():
     return _client
 
 
-def _get_products() -> List[str]:
+def _get_products() -> List[Dict[str, Any]]:
     global _products
     if _products is None:
-        _products = json.loads(_PRODUCTS_PATH.read_text()) if _PRODUCTS_PATH.exists() else []
+        data = json.loads(_PRODUCTS_PATH.read_text()) if _PRODUCTS_PATH.exists() else []
+        # If it's list of strings (old format), convert to dicts
+        if data and isinstance(data[0], str):
+            _products = [{"name": item, "CIC Code": "", "page": 0} for item in data]
+        else:
+            _products = data
     return _products
 
 
@@ -33,7 +38,8 @@ def _normalize(label: str) -> str:
     products = _get_products()
     if not products:
         return label
-    match = process.extractOne(label, products, score_cutoff=_MATCH_CUTOFF * 100)
+    product_names = [p["name"] for p in products]
+    match = process.extractOne(label, product_names, score_cutoff=_MATCH_CUTOFF * 100)
     return match[0] if match else label
 
 
