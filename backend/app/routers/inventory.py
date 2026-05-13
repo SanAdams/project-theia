@@ -10,7 +10,8 @@ router = APIRouter()
 
 
 class InventoryItem(BaseModel):
-    product: str
+    name: str
+    scan_code: str  # barcode if available, otherwise CIC code
     count: int
 
 
@@ -27,9 +28,18 @@ async def scan_image(file: UploadFile = File(...)):
     raw_bytes = await file.read()
     image_bytes = prepare_image(raw_bytes)
 
-    detected_labels = detect_box_labels(image_bytes)
+    matched_products = detect_box_labels(image_bytes)
 
-    counts = Counter(detected_labels)
-    items = [InventoryItem(product=k, count=v) for k, v in sorted(counts.items())]
+    counts: Counter = Counter(p.cic_code for p in matched_products)
+    product_map = {p.cic_code: p for p in matched_products}
+
+    items = [
+        InventoryItem(
+            name=product_map[cic].name,
+            scan_code=product_map[cic].scan_code,
+            count=count,
+        )
+        for cic, count in sorted(counts.items())
+    ]
 
     return InventoryResult(items=items, total_boxes=sum(counts.values()))
