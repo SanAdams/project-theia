@@ -210,7 +210,7 @@
     "page": 2
   },
   {
-    "name": "Turnovers Bavarian Creme",
+    "name": "Bavarian Creme Turnovers",
     "CIC Code": "94989129",
     "page": 2
   },
@@ -230,92 +230,77 @@
     "page": 2
   },
   {
-    "name": "BEAR CLAW APPLE",
+    "name": "Bear Claw Apple",
     "CIC Code": "94984956",
     "page": 2
   },
   {
-    "name": "BEAR CLAW BAVARIAN CR\u00c8ME",
+    "name": "Bear Claw Bavarian Cr\u00e8me",
     "CIC Code": "94988462",
     "page": 2
   },
   {
-    "name": "HONEY WHEAT WIDE PAN SLICED",
+    "name": "Honey Wheat Wide Pan Sliced",
     "CIC Code": "94990815",
     "page": 2
   },
   {
-    "name": "POTATO WHITE WIDE PAN SLICED",
+    "name": "Potato White Wide Pan Sliced",
     "CIC Code": "94990816",
     "page": 2
   },
   {
-    "name": "EIGHT GRAIN WIDE PAN SLICED",
+    "name": "Eight Grain Wide Pan Sliced",
     "CIC Code": "94990814",
     "page": 2
   },
   {
-    "name": "RUSTIC SOURDOUGH WIDE PAN BREAD",
+    "name": "Rustic Sourdough Wide Pan Bread",
     "CIC Code": "94990818",
     "page": 2
   },
   {
-    "name": "ENGLISH MUFFIN",
+    "name": "English Muffin Bread Sliced",
     "CIC Code": "94990817",
     "page": 2
   },
   {
-    "name": "S SEL FOUGASSE BLACK OLIVE",
-    "CIC Code": "94011214",
-    "page": 3
-  },
-  {
-    "name": "S SEL BREAD FOUGASSE RED PEPPER",
-    "CIC Code": "94011215",
-    "page": 3
-  },
-  {
-    "name": "S SEL BREAD FOCACCIA OLIVE OIL & HERB",
-    "CIC Code": "94011217",
-    "page": 3
-  },
-  {
-    "name": "Choc Chip",
+    "name": "Chocolate Chip Cookies",
     "CIC Code": "94987417",
     "page": 3
   },
   {
-    "name": "M&M",
+    "name": "M&M Cookies",
     "CIC Code": "94984441",
     "page": 3
   },
   {
-    "name": "Oatmeal",
+    "name": "Oatmeal Cookies",
     "CIC Code": "94984437",
     "page": 3
   },
   {
-    "name": "Cowboy",
+    "name": "Cowboy Cookies",
     "CIC Code": "94987946",
     "page": 3
   },
   {
-    "name": "Sugar",
+    "name": "Sugar Cookies",
     "CIC Code": "94984440",
     "page": 3
   },
   {
-    "name": "Red Velvet",
+    "name": "Red Velvet Cookies",
     "CIC Code": "94984443",
     "page": 3
   },
   {
-    "name": "Brownie",
+    "name": "Brownie Cookies",
     "CIC Code": "94988442",
     "page": 3
   },
   {
-    "name": "Lemon Cookie 1 oz.",
+    "name": "Lemon Cookie",
     "CIC Code": "94982437",
     "page": 3
   },
@@ -350,72 +335,72 @@
     "page": 3
   },
   {
-    "name": "Chunk",
+    "name": "Choclate Chunk Cookies",
     "CIC Code": "94980934",
     "page": 3
   },
   {
-    "name": "Rainbow",
+    "name": "Rainbow Chip Cookies 3oz",
     "CIC Code": "94981837",
     "page": 3
   },
   {
-    "name": "Sugar",
+    "name": "Sugar Cookies 3oz",
     "CIC Code": "94981197",
     "page": 3
   },
   {
-    "name": "Extreme",
+    "name": "Extreme Chocolate Chip Cookies",
     "CIC Code": "94981082",
     "page": 3
   },
   {
-    "name": "Cranberry Oatmeal",
+    "name": "Cranberry Oatmeal Cookies",
     "CIC Code": "94981188",
     "page": 3
   },
   {
-    "name": "Caramel Custard Filled",
+    "name": "Mini Caramel Custard Filled Donuts",
     "CIC Code": "95152691",
     "page": 3
   },
   {
-    "name": "Chocolate Boston",
+    "name": "Mini Chocolate Boston Donuts",
     "CIC Code": "95151669",
     "page": 3
   },
   {
-    "name": "Raspberry Filled",
+    "name": "Mini Raspberry Filled Donuts",
     "CIC Code": "95151971",
     "page": 3
   },
   {
-    "name": "Apple",
+    "name": "Apple Pie 9in",
     "CIC Code": "94985582",
     "page": 4
   },
   {
-    "name": "Caramel Apple Crumble",
+    "name": "Dutch Apple Pie 9in",
     "CIC Code": "94985612",
     "page": 4
   },
   {
-    "name": "Cherry",
+    "name": "Cherry Pie 9in",
     "CIC Code": "94985476",
     "page": 4
   },
   {
-    "name": "Marrionberry",
+    "name": "Marrionberry Pie 9in",
     "CIC Code": "94985530",
     "page": 4
   },
   {
-    "name": "Peach",
+    "name": "Peach Pie 9in ",
     "CIC Code": "94985590",
     "page": 4
   },
   {
-    "name": "Strawberry Rhubarb",
+    "name": "Strawberry Rhubarb Pie 9in",
     "CIC Code": "94985523",
     "page": 4
   },
@@ -427,11 +412,6 @@
   {
     "name": "Multigrain Filone 6ct",
     "CIC Code": "94987324",
-    "page": 4
-  },
-  {
-    "name": "S SEL ROLLS CIABATTA EVERYTHING 4CT",
-    "CIC Code": "94050356",
     "page": 4
   },
   {
@@ -505,12 +485,12 @@
     "page": 4
   },
   {
-    "name": "BETTER BUTTER HONEY BUTTER",
+    "name": "Better Butter Honey Butter",
     "CIC Code": "94010225",
     "page": 4
   },
   {
-    "name": "BETTER BUTTER ASIAGO & CHIVE BUTTER",
+    "name": "Better Butter Asiago & Chive Butter",
     "CIC Code": "94010680",
     "page": 4
   },
@@ -615,7 +595,7 @@
     "page": 5
   },
   {
-    "name": "(NEW) PEANUT BUTTER COOKIE",
+    "name": "(New) Peanut Butter Cookie",
     "CIC Code": "95104357",
     "page": 5
   },
@@ -650,7 +630,7 @@
     "page": 5
   },
   {
-    "name": "ST.PIERRE WAFFLES BRIOCHE BUTTER 6CT",
+    "name": "St.Pierre Waffles Brioche Butter 6ct",
     "CIC Code": "95151069",
     "page": 5
   },
@@ -700,12 +680,12 @@
     "page": 6
   },
   {
-    "name": "Brownie Bites",
+    "name": "Brownie Bites (Sugar Bowl)",
     "CIC Code": "94984126",
     "page": 6
   },
   {
-    "name": "Palmiers mini",
+    "name": "Mini Palmiers",
     "CIC Code": "94989477",
     "page": 6
   },
@@ -790,11 +770,6 @@
     "page": 7
   },
   {
-    "name": "Carrot Zucchini",
-    "CIC Code": "95022364",
-    "page": 7
-  },
-  {
     "name": "Lemon Pound Cake",
     "CIC Code": "95022363",
     "page": 7
@@ -810,7 +785,7 @@
     "page": 7
   },
   {
-    "name": "SCHWARTZ BROTHERS BISCUITS CHILI",
+    "name": "Schwartz Brothers Biscuits Chili",
     "CIC Code": "95152457",
     "page": 7
   },
@@ -840,7 +815,7 @@
     "page": 7
   },
   {
-    "name": "Wild Bluebery Oat & flax",
+    "name": "Wild Blueberry Oat & Flax",
     "CIC Code": "95011908",
     "page": 7
   },
@@ -865,12 +840,12 @@
     "page": 7
   },
   {
-    "name": "Schwartz Brothers mini Lemon Tart",
+    "name": "Schwartz Brothers Mini Lemon Tart",
     "CIC Code": "95105026",
     "page": 7
   },
   {
-    "name": "Schwartz Brothers mini Blueberry Tart",
+    "name": "Schwartz Brothers Mini Blueberry Tart",
     "CIC Code": "95105027",
     "page": 7
   },
@@ -890,12 +865,12 @@
     "page": 7
   },
   {
-    "name": "S SEL NAAN BITES GARLIC",
+    "name": "S Sel Naan Bites Garlic",
     "CIC Code": "94010133",
     "page": 7
   },
   {
-    "name": "S SEL NAAN BITES ORIGINAL",
+    "name": "S Sel Naan Bites Original",
     "CIC Code": "94010085",
     "page": 7
   },
@@ -925,27 +900,27 @@
     "page": 8
   },
   {
-    "name": "NEW 7 Layer Square 9ct",
+    "name": "New 7 Layer Square 9ct",
     "CIC Code": "95104773",
     "page": 8
   },
   {
-    "name": "NEW Lemon Square 9ct",
+    "name": "New Lemon Square 9ct",
     "CIC Code": "95104769",
     "page": 8
   },
   {
-    "name": "COOKIES CHOCOLATE CHIP SF ANN MARIES",
+    "name": "Cookies Chocolate Chip SF Ann Maries",
     "CIC Code": "95200310",
     "page": 8
   },
   {
-    "name": "COOKIES OATMEAL RAISIN NSA ANN MARIES",
+    "name": "Cookies Oatmeal Raisin NSA Ann Maries",
     "CIC Code": "95200309",
     "page": 8
   },
   {
-    "name": "ANN MARIES RING CAKE ANGEL FOOD SF",
+    "name": "Ann Maries Ring Cake Angel Food SF",
     "CIC Code": "95200187",
     "page": 8
   },
@@ -1030,12 +1005,12 @@
     "page": 9
   },
   {
-    "name": "Flax 4Life MUFFIN MINI GF CHOC",
+    "name": "Flax 4Life Muffin Mini GF Choc",
     "CIC Code": "95200105",
     "page": 9
   },
   {
-    "name": "FLAX4LIFE MUFFIN BLUEBERRY",
+    "name": "Flax4Life Muffin Blueberry",
     "CIC Code": "95200092",
     "page": 9
   },
@@ -1045,7 +1020,7 @@
     "page": 9
   },
   {
-    "name": "FLAX4LIFE BROWNIES CHOCOLATE NSA",
+    "name": "Flax4Life Brownies Chocolate NSA",
     "CIC Code": "95200571",
     "page": 9
   },
@@ -1215,7 +1190,7 @@
     "page": 10
   },
   {
-    "name": "NEW Angel Food Mix (Dawn)",
+    "name": "New Angel Food Mix (Dawn)",
     "CIC Code": "94989938",
     "page": 10
   },
@@ -2005,27 +1980,27 @@
     "page": 17
   },
   {
-    "name": "LARRY & TERRIS CAKE TOPPER 0 -",
+    "name": "Larry & Terris Cake Topper 0 -",
     "CIC Code": "95800267",
     "page": 17
   },
   {
-    "name": "LARRY & TERRIS CAKE TOPPER 2 -",
+    "name": "Larry & Terris Cake Topper 2 -",
     "CIC Code": "95800286",
     "page": 17
   },
   {
-    "name": "LARRY & TERRIS CAKE TOPPER 4 -",
+    "name": "Larry & Terris Cake Topper 4 -",
     "CIC Code": "95800270",
     "page": 17
   },
   {
-    "name": "LARRY & TERRIS CAKE TOPPER 6 -",
+    "name": "Larry & Terris Cake Topper 6 -",
     "CIC Code": "95800271",
     "page": 17
   },
   {
-    "name": "LARRY & TERRIS CAKE TOPPER 8 -",
+    "name": "Larry & Terris Cake Topper 8 -",
     "CIC Code": "95800273",
     "page": 17
   },
@@ -2055,52 +2030,52 @@
     "page": 17
   },
   {
-    "name": "LARRY & TERRIS CAKE TOPPER 1 -",
+    "name": "Larry & Terris Cake Topper 1 -",
     "CIC Code": "95800266",
     "page": 17
   },
   {
-    "name": "LARRY & TERRIS CAKE TOPPER 3 -",
+    "name": "Larry & Terris Cake Topper 3 -",
     "CIC Code": "95800287",
     "page": 17
   },
   {
-    "name": "LARRY & TERRIS CAKE TOPPER 5 -",
+    "name": "Larry & Terris Cake Topper 5 -",
     "CIC Code": "95800275",
     "page": 17
   },
   {
-    "name": "LARRY & TERRIS CAKE TOPPER 7 -",
+    "name": "Larry & Terris Cake Topper 7 -",
     "CIC Code": "95800272",
     "page": 17
   },
   {
-    "name": "LARRY & TERRIS CAKE TOPPER 9 -",
+    "name": "Larry & Terris Cake Topper 9 -",
     "CIC Code": "95800274",
     "page": 17
   },
   {
-    "name": "PINK & YELLOW",
+    "name": "Pink & Yellow",
     "CIC Code": "94982303",
     "page": 18
   },
   {
-    "name": "PASTEL CONFETTI",
+    "name": "Pastel Confetti",
     "CIC Code": "94982302",
     "page": 18
   },
   {
-    "name": "PINK",
+    "name": "Pink",
     "CIC Code": "94982301",
     "page": 18
   },
   {
-    "name": "SPRING MIX",
+    "name": "Spring Mix",
     "CIC Code": "94982309",
     "page": 18
   },
   {
-    "name": "RAINBOW",
+    "name": "Rainbow",
     "CIC Code": "94982288",
     "page": 18
   },
@@ -2180,27 +2155,27 @@
     "page": 19
   },
   {
-    "name": "HERO BUNS CLASSIC HAMBURGER -",
+    "name": "Hero Buns Classic Hamburger",
     "CIC Code": "96300082",
     "page": 19
   },
   {
-    "name": "HERO BUNS HOT DOG CLASSIC - FROZEN",
+    "name": "Hero Buns Hot Dog Classic Frozen",
     "CIC Code": "96300104",
     "page": 19
   },
   {
-    "name": "HERO ROLLS HAWAIIAN",
+    "name": "Hero Rolls Hawaiian",
     "CIC Code": "96300510",
     "page": 19
   },
   {
-    "name": "HERO BREAD CLASSIC WHITE",
+    "name": "Hero Bread Classic White",
     "CIC Code": "96150398",
     "page": 19
   },
   {
-    "name": "HERO BREAD SEEDED SLICED",
+    "name": "Hero Bread Seeded Sliced",
     "CIC Code": "96150396",
     "page": 19
   }
