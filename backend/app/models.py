@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from typing import List
 
 
 @dataclass
@@ -6,9 +7,14 @@ class Product:
     name: str
     cic_code: str
     barcode: str = ""
+    label: str = ""  # exact text printed on the box label; used for OCR matching
+    nicknames: List[str] = field(default_factory=list)
     page: int = 0
 
     @property
     def scan_code(self) -> str:
-        """Barcode if populated, otherwise falls back to CIC code."""
         return self.barcode if self.barcode else self.cic_code
+
+    @property
+    def match_text(self) -> str:
+        return self.label if self.label else self.name
