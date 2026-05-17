@@ -11,7 +11,7 @@ router = APIRouter()
 
 class InventoryItem(BaseModel):
     name: str
-    scan_code: str  # barcode if available, otherwise CIC code
+    cic_code: str
     count: int
 
 
@@ -36,7 +36,7 @@ async def scan_image(file: UploadFile = File(...)):
     items = [
         InventoryItem(
             name=product_map[cic].name,
-            scan_code=product_map[cic].scan_code,
+            cic_code=cic,
             count=count,
         )
         for cic, count in sorted(counts.items())
