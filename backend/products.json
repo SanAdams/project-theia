@@ -1,11 +1,12 @@
 [
   {
-    "name": "Donut Ring",
+    "name": "Ring Donut",
     "CIC Code": "94981327",
-    "page": 1
+    "page": 1,
+    "label": "READY TO FINISH RING YEAST-RAISED DONUT"
   },
   {
-    "name": "Donut Bar Long John",
+    "name": "Long John Donut",
     "CIC Code": "94986861",
     "page": 1
   },
@@ -112,7 +113,8 @@
   {
     "name": "NY Bagels",
     "CIC Code": "94982922",
-    "page": 1
+    "page": 1,
+    "label": "NEW YORK STYLE BAGEL DOUGH"
   },
   {
     "name": "Berry Bagels",
@@ -465,17 +467,19 @@
     "page": 4
   },
   {
-    "name": "Izzio Bread Sourdough San Francisco",
+    "name": "Izzio San Francisco Sourdough Bread",
     "CIC Code": "94010360",
-    "page": 4
+    "page": 4,
+    "label": "BRD-IZZ SF SD"
   },
   {
-    "name": "Izzio Bread Sourdough Italian Sliced",
+    "name": "Izzio Italian Sourdough Bread",
     "CIC Code": "94011190",
-    "page": 4
+    "page": 4,
+    "label": "SL-IZ Italian Sourdough"
   },
   {
-    "name": "Izzio Bread Rustic Potato Sourdough",
+    "name": "Izzio Rustic Potato Sourdough Bread",
     "CIC Code": "94010390",
     "page": 4
   },
@@ -680,7 +684,7 @@
     "page": 6
   },
   {
-    "name": "Brownie Bites (Sugar Bowl)",
+    "name": "Petite Brownie Bites (Sugar Bowl)",
     "CIC Code": "94984126",
     "page": 6
   },
@@ -700,12 +704,12 @@
     "page": 6
   },
   {
-    "name": "Brownie Bites",
+    "name": "Mini Brownie Bites",
     "CIC Code": "95022366",
     "page": 6
   },
   {
-    "name": "Brownie Powdered Bites",
+    "name": "Mini Powdered Brownie Bites",
     "CIC Code": "95022370",
     "page": 6
   },
@@ -715,22 +719,22 @@
     "page": 6
   },
   {
-    "name": "Roastd Garlic",
+    "name": "Roastd Garlic Take and Bake Loaf",
     "CIC Code": "94011148",
     "page": 6
   },
   {
-    "name": "Demi French",
+    "name": "Demi French Baguette Take and Bake",
     "CIC Code": "94011138",
     "page": 6
   },
   {
-    "name": "Sourdough",
+    "name": "Sourdough Take and Bake Loaf",
     "CIC Code": "94011150",
     "page": 6
   },
   {
-    "name": "Overjoyed Fudge Brownie 8in",
+    "name": "Overjoyed Fudge Brownie Ice Cream Cake",
     "CIC Code": "95450030",
     "page": 6
   },
@@ -745,22 +749,22 @@
     "page": 6
   },
   {
-    "name": "Overjoyed White Cake 8in",
+    "name": "Overjoyed White Ice Cream Cake",
     "CIC Code": "95450031",
     "page": 6
   },
   {
-    "name": "Overjoyed Chocolate Cake 8in",
+    "name": "Overjoyed Chocolate Ice Cream Cake",
     "CIC Code": "95450026",
     "page": 6
   },
   {
-    "name": "Overjoyed Cookie n Cream 8in",
+    "name": "Overjoyed Cookies n Cream Ice Cream Cake",
     "CIC Code": "95450029",
     "page": 6
   },
   {
-    "name": "Overjoyed Neapolitan",
+    "name": "Overjoyed Neapolitan Ice Cream Cake",
     "CIC Code": "95450027",
     "page": 6
   },
@@ -1070,22 +1074,22 @@
     "page": 9
   },
   {
-    "name": "Cherry",
+    "name": "Cherry Mini Pie",
     "CIC Code": "95022616",
     "page": 9
   },
   {
-    "name": "Pecan",
+    "name": "Pecan Mini Pie",
     "CIC Code": "95023217",
     "page": 9
   },
   {
-    "name": "Apple",
+    "name": "Apple Mini Pie",
     "CIC Code": "95020054",
     "page": 9
   },
   {
-    "name": "Blueberry",
+    "name": "Blueberry Mini Pie",
     "CIC Code": "95022614",
     "page": 9
   },
@@ -1340,27 +1344,27 @@
     "page": 12
   },
   {
-    "name": "Caramel",
+    "name": "Caramel Bettercreme",
     "CIC Code": "94981326",
     "page": 12
   },
   {
-    "name": "Cookies & Cream",
+    "name": "Cookies & Cream Bettercreme",
     "CIC Code": "94981319",
     "page": 12
   },
   {
-    "name": "Vanilla",
+    "name": "Vanilla Bettercreme",
     "CIC Code": "94980645",
     "page": 12
   },
   {
-    "name": "Chocolate Hersheys",
+    "name": "Chocolate Hersheys Bettercreme",
     "CIC Code": "94980648",
     "page": 12
   },
   {
-    "name": "Strawberry",
+    "name": "Strawberry Bettercreme",
     "CIC Code": "94982788",
     "page": 12
   },
