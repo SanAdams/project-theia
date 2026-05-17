@@ -33,3 +33,5 @@ web-build/
 
 # Claude Code
 .claude/
+
+backend/tests/test_images/
