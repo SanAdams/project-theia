@@ -6,7 +6,8 @@ import CameraScreen from './src/screens/CameraScreen';
 import ResultsScreen from './src/screens/ResultsScreen';
 
 export interface InventoryItem {
-  product: string;
+  name: string;
+  cic_code: string;
   count: number;
 }
 

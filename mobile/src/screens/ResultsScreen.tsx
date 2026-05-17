@@ -32,14 +32,17 @@ export default function ResultsScreen() {
         ListHeaderComponent={() => (
           <View style={[styles.row, styles.header]}>
             <Text style={[styles.rank, styles.headerText]}>#</Text>
-            <Text style={[styles.product, styles.headerText]}>Product</Text>
+            <Text style={[styles.productCell, styles.headerText]}>Product</Text>
             <Text style={[styles.count, styles.headerText]}>Count</Text>
           </View>
         )}
         renderItem={({ item, index }: { item: InventoryItem; index: number }) => (
           <View style={styles.row}>
             <Text style={styles.rank}>{index + 1}</Text>
-            <Text style={styles.product}>{item.product}</Text>
+            <View style={styles.productCell}>
+              <Text style={styles.productName}>{item.name}</Text>
+              <Text style={styles.cicCode}>{item.cic_code}</Text>
+            </View>
             <Text style={styles.count}>{item.count}</Text>
           </View>
         )}
@@ -78,7 +81,9 @@ const styles = StyleSheet.create({
   },
   headerText: { fontWeight: '600', color: '#6C6C70', fontSize: 12 },
   rank: { width: 28, color: '#6C6C70', fontSize: 15 },
-  product: { flex: 1, fontSize: 15, color: '#1C1C1E' },
+  productCell: { flex: 1 },
+  productName: { fontSize: 15, color: '#1C1C1E' },
+  cicCode: { fontSize: 12, color: '#6C6C70', marginTop: 1 },
   count: { width: 48, textAlign: 'right', fontSize: 15, fontWeight: '600', color: '#1C1C1E' },
   button: { backgroundColor: '#007AFF', padding: 16, borderRadius: 14, alignItems: 'center' },
   buttonText: { color: '#fff', fontSize: 17, fontWeight: '600' },
