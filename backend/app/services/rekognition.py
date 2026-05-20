@@ -14,6 +14,7 @@ log = logging.getLogger(__name__)
 
 _client = None
 _products: List[Product] | None = None
+_products_mtime: float = 0.0
 
 _PRODUCTS_PATH = Path(__file__).parent.parent.parent / "products.json"
 _MATCH_CUTOFF = 0.75
@@ -22,12 +23,14 @@ _MATCH_CUTOFF = 0.75
 # Raise _X_PAD if one box's text splits across multiple groups (overcounting).
 # Lower _X_PAD if adjacent boxes merge into one group (undercounting).
 _X_PAD = 0.005  # ~0.5% of image width — tight to keep adjacent boxes separate
-_Y_PAD = 0.04   # ~4% of image height — loose enough to span multi-line labels
+_Y_PAD = 0.04  # ~4% of image height — loose enough to span multi-line labels
 
 # Box detection via DetectLabels
 _BOX_LABEL_NAMES = {"Box", "Cardboard", "Carton", "Container", "Package", "Packaging"}
 _DETECT_LABELS_MIN_CONFIDENCE = 60.0
-_CROP_PADDING = 0.02   # extra 2% of image dimension added around each detected box region
+_CROP_PADDING = (
+    0.02  # extra 2% of image dimension added around each detected box region
+)
 _REGION_IOU_THRESHOLD = 0.5  # regions with IoU above this are considered duplicates
 
 
@@ -42,8 +45,10 @@ def _get_client():
 
 
 def _get_products() -> List[Product]:
-    global _products
-    if _products is None:
+    global _products, _products_mtime
+    mtime = _PRODUCTS_PATH.stat().st_mtime if _PRODUCTS_PATH.exists() else 0.0
+    if _products is None or mtime != _products_mtime:
+        _products_mtime = mtime
         data = json.loads(_PRODUCTS_PATH.read_text()) if _PRODUCTS_PATH.exists() else []
         if data and isinstance(data[0], str):
             _products = [Product(name=item, cic_code="") for item in data]
@@ -55,7 +60,6 @@ def _get_products() -> List[Product]:
                     barcode=p.get("barcode", ""),
                     label=p.get("label", ""),
                     nicknames=p.get("nicknames", []),
-                    page=p.get("page", 0),
                 )
                 for p in data
             ]
@@ -69,6 +73,10 @@ def _match_product(label: str) -> Optional[Product]:
 
     # Primary pass: match against label/name
     match_texts = [p.match_text for p in products]
+    top = process.extract(label, match_texts, limit=5)
+    log.info("    Top matches for %r:", label)
+    for text, score, _ in top:
+        log.info("      [%.1f%%] %s", score, text)
     result = process.extractOne(label, match_texts, score_cutoff=_MATCH_CUTOFF * 100)
     if result:
         return next(p for p in products if p.match_text == result[0])
@@ -77,7 +85,9 @@ def _match_product(label: str) -> Optional[Product]:
     candidates = [(nick, p) for p in products for nick in p.nicknames]
     if not candidates:
         return None
-    result = process.extractOne(label, [c[0] for c in candidates], score_cutoff=_MATCH_CUTOFF * 100)
+    result = process.extractOne(
+        label, [c[0] for c in candidates], score_cutoff=_MATCH_CUTOFF * 100
+    )
     if not result:
         return None
     log.info("    (matched via nickname %r)", result[0])
@@ -87,6 +97,7 @@ def _match_product(label: str) -> Optional[Product]:
 # ---------------------------------------------------------------------------
 # Full-image fallback: spatial grouping of DetectText results
 # ---------------------------------------------------------------------------
+
 
 def _overlaps_group(bb, group) -> bool:
     for member in group:
@@ -124,14 +135,22 @@ def _match_full_image(client, image_bytes: bytes) -> List[Product]:
     all_lines = [d for d in response["TextDetections"] if d["Type"] == "LINE"]
     detections = [d for d in all_lines if d["Confidence"] >= 80.0]
 
-    log.info("Full-image DetectText: %d LINE detections, %d above 80%% confidence",
-             len(all_lines), len(detections))
+    log.info(
+        "Full-image DetectText: %d LINE detections, %d above 80%% confidence",
+        len(all_lines),
+        len(detections),
+    )
     for d in all_lines:
         bb = d["Geometry"]["BoundingBox"]
-        log.info("  [%.0f%%] %-40s  x=%.3f–%.3f  y=%.3f–%.3f",
-                 d["Confidence"], repr(d["DetectedText"]),
-                 bb["Left"], bb["Left"] + bb["Width"],
-                 bb["Top"],  bb["Top"]  + bb["Height"])
+        log.info(
+            "  [%.0f%%] %-40s  x=%.3f–%.3f  y=%.3f–%.3f",
+            d["Confidence"],
+            repr(d["DetectedText"]),
+            bb["Left"],
+            bb["Left"] + bb["Width"],
+            bb["Top"],
+            bb["Top"] + bb["Height"],
+        )
 
     groups = _group_detections(detections)
     log.info("Grouped into %d spatial cluster(s)", len(groups))
@@ -155,6 +174,7 @@ def _match_full_image(client, image_bytes: bytes) -> List[Product]:
 # ---------------------------------------------------------------------------
 # Two-pass approach: DetectLabels -> crop -> DetectText per box
 # ---------------------------------------------------------------------------
+
 
 def _iou(a: dict, b: dict) -> float:
     """Intersection over union for two normalized bounding boxes."""
@@ -214,7 +234,8 @@ def _match_from_crops(client, image_bytes: bytes, regions: List[dict]) -> List[P
         crop_bytes = _crop_region(image_bytes, bb)
         response = client.detect_text(Image={"Bytes": crop_bytes})
         lines = [
-            d for d in response["TextDetections"]
+            d
+            for d in response["TextDetections"]
             if d["Type"] == "LINE" and d["Confidence"] >= 80.0
         ]
         texts = [d["DetectedText"] for d in lines]
@@ -234,6 +255,7 @@ def _match_from_crops(client, image_bytes: bytes, regions: List[dict]) -> List[P
 # Public entry point
 # ---------------------------------------------------------------------------
 
+
 def detect_box_labels(image_bytes: bytes) -> List[Product]:
     """
     Two-pass: DetectLabels to find box regions, then DetectText on each crop.
@@ -243,10 +265,15 @@ def detect_box_labels(image_bytes: bytes) -> List[Product]:
 
     regions = _find_box_regions(client, image_bytes)
     if regions:
-        log.info("DetectLabels: %d box region(s) found — running per-crop DetectText", len(regions))
+        log.info(
+            "DetectLabels: %d box region(s) found — running per-crop DetectText",
+            len(regions),
+        )
         matched = _match_from_crops(client, image_bytes, regions)
     else:
-        log.info("DetectLabels: no box regions found — falling back to full-image DetectText")
+        log.info(
+            "DetectLabels: no box regions found — falling back to full-image DetectText"
+        )
         matched = _match_full_image(client, image_bytes)
 
     log.info("Result: %d product(s) detected", len(matched))
