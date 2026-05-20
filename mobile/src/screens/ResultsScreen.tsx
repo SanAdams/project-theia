@@ -1,17 +1,17 @@
-import React from 'react';
+import React from "react";
 import {
   View,
   Text,
   StyleSheet,
   FlatList,
   TouchableOpacity,
-} from 'react-native';
-import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList, InventoryItem } from '../../App';
+} from "react-native";
+import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { RootStackParamList, InventoryItem } from "../../App";
 
-type ResultsRouteProp = RouteProp<RootStackParamList, 'Results'>;
-type NavigationProp = StackNavigationProp<RootStackParamList, 'Results'>;
+type ResultsRouteProp = RouteProp<RootStackParamList, "Results">;
+type NavigationProp = StackNavigationProp<RootStackParamList, "Results">;
 
 export default function ResultsScreen() {
   const route = useRoute<ResultsRouteProp>();
@@ -36,7 +36,13 @@ export default function ResultsScreen() {
             <Text style={[styles.count, styles.headerText]}>Count</Text>
           </View>
         )}
-        renderItem={({ item, index }: { item: InventoryItem; index: number }) => (
+        renderItem={({
+          item,
+          index,
+        }: {
+          item: InventoryItem;
+          index: number;
+        }) => (
           <View style={styles.row}>
             <Text style={styles.rank}>{index + 1}</Text>
             <View style={styles.productCell}>
@@ -48,7 +54,10 @@ export default function ResultsScreen() {
         )}
       />
 
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Camera')}>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => navigation.navigate("Camera")}
+      >
         <Text style={styles.buttonText}>Scan Another</Text>
       </TouchableOpacity>
     </View>
@@ -56,35 +65,55 @@ export default function ResultsScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F2F2F7', padding: 16 },
+  container: { flex: 1, backgroundColor: "#F2F2F7", padding: 16 },
   summaryCard: {
-    backgroundColor: '#007AFF',
+    backgroundColor: "#007AFF",
     borderRadius: 16,
     padding: 24,
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: 16,
   },
-  summaryLabel: { color: 'rgba(255,255,255,0.8)', fontSize: 14, marginBottom: 4 },
-  summaryCount: { color: '#fff', fontSize: 48, fontWeight: '700' },
-  list: { flex: 1, backgroundColor: '#fff', borderRadius: 12, marginBottom: 16 },
+  summaryLabel: {
+    color: "rgba(255,255,255,0.8)",
+    fontSize: 14,
+    marginBottom: 4,
+  },
+  summaryCount: { color: "#fff", fontSize: 48, fontWeight: "700" },
+  list: {
+    flex: 1,
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    marginBottom: 16,
+  },
   row: {
-    flexDirection: 'row',
+    flexDirection: "row",
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#E5E5EA',
+    borderBottomColor: "#E5E5EA",
   },
   header: {
-    backgroundColor: '#F2F2F7',
+    backgroundColor: "#F2F2F7",
     borderTopLeftRadius: 12,
     borderTopRightRadius: 12,
   },
-  headerText: { fontWeight: '600', color: '#6C6C70', fontSize: 12 },
-  rank: { width: 28, color: '#6C6C70', fontSize: 15 },
+  headerText: { fontWeight: "600", color: "#6C6C70", fontSize: 12 },
+  rank: { width: 28, color: "#6C6C70", fontSize: 15 },
   productCell: { flex: 1 },
-  productName: { fontSize: 15, color: '#1C1C1E' },
-  cicCode: { fontSize: 12, color: '#6C6C70', marginTop: 1 },
-  count: { width: 48, textAlign: 'right', fontSize: 15, fontWeight: '600', color: '#1C1C1E' },
-  button: { backgroundColor: '#007AFF', padding: 16, borderRadius: 14, alignItems: 'center' },
-  buttonText: { color: '#fff', fontSize: 17, fontWeight: '600' },
+  productName: { fontSize: 15, color: "#1C1C1E" },
+  cicCode: { fontSize: 12, color: "#6C6C70", marginTop: 1 },
+  count: {
+    width: 48,
+    textAlign: "right",
+    fontSize: 15,
+    fontWeight: "600",
+    color: "#1C1C1E",
+  },
+  button: {
+    backgroundColor: "#007AFF",
+    padding: 16,
+    borderRadius: 14,
+    alignItems: "center",
+  },
+  buttonText: { color: "#fff", fontSize: 17, fontWeight: "600" },
 });

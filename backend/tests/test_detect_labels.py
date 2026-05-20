@@ -20,7 +20,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 BOX_LABELS = {"Box", "Cardboard", "Carton", "Container", "Package", "Packaging"}
-MIN_CONFIDENCE = 50.0   # lower than normal so we see everything rekognition finds
+MIN_CONFIDENCE = 50.0  # lower than normal so we see everything rekognition finds
 
 
 def main(image_path: str):
@@ -31,7 +31,9 @@ def main(image_path: str):
 
     image_bytes = path.read_bytes()
 
-    client = boto3.client("rekognition", region_name=os.getenv("AWS_REGION", "us-east-1"))
+    client = boto3.client(
+        "rekognition", region_name=os.getenv("AWS_REGION", "us-east-1")
+    )
 
     print(f"Sending {path.name} to Rekognition DetectLabels …\n")
     response = client.detect_labels(
@@ -62,7 +64,9 @@ def main(image_path: str):
 
     box_like = [l for l in labels if l["Name"] in BOX_LABELS]
     if not box_like:
-        print("\nNo box-like labels detected. Annotating ALL labels that have bounding boxes.")
+        print(
+            "\nNo box-like labels detected. Annotating ALL labels that have bounding boxes."
+        )
         box_like = [l for l in labels if l.get("Instances")]
 
     drawn = 0
@@ -74,7 +78,11 @@ def main(image_path: str):
             x1 = x0 + bb["Width"] * w
             y1 = y0 + bb["Height"] * h
             draw.rectangle([x0, y0, x1, y1], outline="red", width=3)
-            draw.text((x0 + 4, y0 + 4), f"{label['Name']} {inst['Confidence']:.0f}%", fill="red")
+            draw.text(
+                (x0 + 4, y0 + 4),
+                f"{label['Name']} {inst['Confidence']:.0f}%",
+                fill="red",
+            )
             drawn += 1
 
     out_path = path.with_stem(path.stem + "_labels")

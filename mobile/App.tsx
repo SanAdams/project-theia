@@ -1,9 +1,9 @@
-import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
-import CameraScreen from './src/screens/CameraScreen';
-import ResultsScreen from './src/screens/ResultsScreen';
+import React from "react";
+import { NavigationContainer } from "@react-navigation/native";
+import { createStackNavigator } from "@react-navigation/stack";
+import { SafeAreaProvider } from "react-native-safe-area-context";
+import CameraScreen from "./src/screens/CameraScreen";
+import ResultsScreen from "./src/screens/ResultsScreen";
 
 export interface InventoryItem {
   name: string;
@@ -26,12 +26,12 @@ export default function App() {
           <Stack.Screen
             name="Camera"
             component={CameraScreen}
-            options={{ title: 'Project Theia' }}
+            options={{ title: "Project Theia" }}
           />
           <Stack.Screen
             name="Results"
             component={ResultsScreen}
-            options={{ title: 'Inventory Results' }}
+            options={{ title: "Inventory Results" }}
           />
         </Stack.Navigator>
       </NavigationContainer>

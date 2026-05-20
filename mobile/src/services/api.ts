@@ -1,13 +1,13 @@
-import axios from 'axios';
-import { Platform } from 'react-native';
-import { InventoryItem } from '../../App';
+import axios from "axios";
+import { Platform } from "react-native";
+import { InventoryItem } from "../../App";
 
-const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:8000';
+const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:8000";
 
 // On web, use the same host the browser loaded the app from (port 8000).
 // This works whether you're on localhost or accessing via IP from another device.
 const WEB_API_BASE_URL =
-  typeof window !== 'undefined'
+  typeof window !== "undefined"
     ? `http://${window.location.hostname}:8000`
     : API_BASE_URL;
 
@@ -19,15 +19,18 @@ export interface ScanResult {
 }
 
 export async function scanImage(imageUri: string): Promise<ScanResult> {
-  if (Platform.OS === 'web') {
+  if (Platform.OS === "web") {
     // On web, use native browser fetch directly — axios's adapter has issues with
     // FormData uploads in the Metro/Expo web bundle (response.body undefined).
     const blobRes = await fetch(imageUri);
     const blob = await blobRes.blob();
     const form = new FormData();
-    form.append('file', blob, 'scan.jpg');
+    form.append("file", blob, "scan.jpg");
     // Let the browser set Content-Type + boundary automatically by omitting the header.
-    const res = await fetch(`${WEB_API_BASE_URL}/api/v1/scan`, { method: 'POST', body: form });
+    const res = await fetch(`${WEB_API_BASE_URL}/api/v1/scan`, {
+      method: "POST",
+      body: form,
+    });
     if (!res.ok) {
       const text = await res.text();
       throw new Error(`Server error ${res.status}: ${text}`);
@@ -37,14 +40,14 @@ export async function scanImage(imageUri: string): Promise<ScanResult> {
 
   // Native: React Native's FormData accepts the { uri, type, name } shape.
   const formData = new FormData();
-  formData.append('file', {
+  formData.append("file", {
     uri: imageUri,
-    type: 'image/jpeg',
-    name: 'scan.jpg',
+    type: "image/jpeg",
+    name: "scan.jpg",
   } as unknown as Blob);
 
-  const response = await client.post<ScanResult>('/api/v1/scan', formData, {
-    headers: { 'Content-Type': 'multipart/form-data' },
+  const response = await client.post<ScanResult>("/api/v1/scan", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
   });
 
   return response.data;

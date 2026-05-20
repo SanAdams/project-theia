@@ -7,11 +7,7 @@
     "userInterfaceStyle": "light",
     "android": {
       "package": "com.projecttheia.app",
-      "permissions": [
-        "CAMERA",
-        "READ_MEDIA_IMAGES",
-        "READ_EXTERNAL_STORAGE"
-      ]
+      "permissions": ["CAMERA", "READ_MEDIA_IMAGES", "READ_EXTERNAL_STORAGE"]
     },
     "ios": {
       "supportsTablet": false,
@@ -21,10 +17,6 @@
         "NSPhotoLibraryUsageDescription": "Project Theia needs photo library access to upload inventory images."
       }
     },
-    "plugins": [
-      "expo-camera",
-      "expo-image-picker",
-      "expo-media-library"
-    ]
+    "plugins": ["expo-camera", "expo-image-picker", "expo-media-library"]
   }
 }
