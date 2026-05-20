@@ -34,4 +34,6 @@ web-build/
 # Claude Code
 .claude/
 
+# Misc
 backend/tests/test_images/
+backend\Order Inventory Guides Jan 2026.pdf
