@@ -22,12 +22,13 @@
     "CIC Code": "94986888"
   },
   {
-    "name": "Perhsing Donut",
+    "name": "Pershing Donut",
     "CIC Code": "94986856"
   },
   {
     "name": "Apple Fritter",
-    "CIC Code": "94981051"
+    "CIC Code": "94981051",
+    "label": "APPLE FRITTER DONUT"
   },
   {
     "name": "French Egg (Crueler) Donut",
@@ -74,7 +75,7 @@
     "CIC Code": "94987495"
   },
   {
-    "name": "Cinnamon Roll Dough Pillsbury",
+    "name": "Cinnamon Roll Dough",
     "CIC Code": "94987200"
   },
   {
@@ -87,7 +88,7 @@
     "label": "NEW YORK STYLE BAGEL DOUGH"
   },
   {
-    "name": "Berry Bagels",
+    "name": "3 Berry Bagels",
     "CIC Code": "94982689"
   },
   {
