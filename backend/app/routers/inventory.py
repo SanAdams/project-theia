@@ -1,10 +1,13 @@
 from fastapi import APIRouter, UploadFile, File, HTTPException
 from collections import Counter
+from pathlib import Path
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional
 
 from app.services.rekognition import detect_box_labels
 from app.services.image_processor import prepare_image
+
+BARCODES_DIR = Path(__file__).parent.parent.parent / "static" / "barcodes"
 
 router = APIRouter()
 
@@ -13,6 +16,7 @@ class InventoryItem(BaseModel):
     name: str
     cic_code: str
     count: int
+    barcode_image_url: Optional[str] = None
 
 
 class InventoryResult(BaseModel):
@@ -38,6 +42,11 @@ async def scan_image(file: UploadFile = File(...)):
             name=product_map[cic].name,
             cic_code=cic,
             count=count,
+            barcode_image_url=(
+                f"/static/barcodes/{cic}.png"
+                if (BARCODES_DIR / f"{cic}.png").exists()
+                else None
+            ),
         )
         for cic, count in sorted(counts.items())
     ]
