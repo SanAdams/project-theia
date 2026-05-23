@@ -6,6 +6,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Project Theia is an inventory scanning app that uses computer vision to count products in commercial freezers. Users photograph boxes, AWS Rekognition performs OCR on box labels, and fuzzy matching identifies products with counts.
 
+## Last Session
+
+**Date:** 2026-05-22  
+**Note:** Built the barcode feature end-to-end: backend extracts and serves barcode images, ResultsScreen now shows the barcode column, keyExtractor bug fixed. Also added a home icon to the Results header and updated canonical product names. Working tree is clean — good stopping point.
+
 ## Setup Commands
 
 ```bash
