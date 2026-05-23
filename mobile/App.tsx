@@ -9,6 +9,7 @@ export interface InventoryItem {
   name: string;
   cic_code: string;
   count: number;
+  barcode_image_url?: string;
 }
 
 export type RootStackParamList = {

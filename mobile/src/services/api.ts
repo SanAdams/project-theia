@@ -13,6 +13,11 @@ const WEB_API_BASE_URL =
 
 const client = axios.create({ baseURL: API_BASE_URL, timeout: 30_000 });
 
+// Resolves to the correct base URL for the current platform.
+// Use this when constructing URLs to backend assets (e.g. barcode images).
+export const resolvedApiBaseUrl =
+  Platform.OS === "web" ? WEB_API_BASE_URL : API_BASE_URL;
+
 export interface ScanResult {
   items: InventoryItem[];
   total_boxes: number;

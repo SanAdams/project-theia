@@ -4,11 +4,13 @@ import {
   Text,
   StyleSheet,
   FlatList,
+  Image,
   TouchableOpacity,
 } from "react-native";
 import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList, InventoryItem } from "../../App";
+import { resolvedApiBaseUrl } from "../services/api";
 
 type ResultsRouteProp = RouteProp<RootStackParamList, "Results">;
 type NavigationProp = StackNavigationProp<RootStackParamList, "Results">;
@@ -27,12 +29,13 @@ export default function ResultsScreen() {
 
       <FlatList
         data={items}
-        keyExtractor={(item) => item.product}
+        keyExtractor={(item) => item.cic_code}
         style={styles.list}
         ListHeaderComponent={() => (
           <View style={[styles.row, styles.header]}>
             <Text style={[styles.rank, styles.headerText]}>#</Text>
             <Text style={[styles.productCell, styles.headerText]}>Product</Text>
+            <Text style={[styles.barcodeCell, styles.headerText]}>Barcode</Text>
             <Text style={[styles.count, styles.headerText]}>Count</Text>
           </View>
         )}
@@ -48,6 +51,19 @@ export default function ResultsScreen() {
             <View style={styles.productCell}>
               <Text style={styles.productName}>{item.name}</Text>
               <Text style={styles.cicCode}>{item.cic_code}</Text>
+            </View>
+            <View style={styles.barcodeCell}>
+              {item.barcode_image_url ? (
+                <Image
+                  source={{
+                    uri: `${resolvedApiBaseUrl}${item.barcode_image_url}`,
+                  }}
+                  style={styles.barcodeImage}
+                  resizeMode="contain"
+                />
+              ) : (
+                <Text style={styles.noBarcode}>—</Text>
+              )}
             </View>
             <Text style={styles.count}>{item.count}</Text>
           </View>
@@ -87,7 +103,8 @@ const styles = StyleSheet.create({
   },
   row: {
     flexDirection: "row",
-    paddingVertical: 12,
+    alignItems: "center",
+    paddingVertical: 10,
     paddingHorizontal: 16,
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: "#E5E5EA",
@@ -102,6 +119,13 @@ const styles = StyleSheet.create({
   productCell: { flex: 1 },
   productName: { fontSize: 15, color: "#1C1C1E" },
   cicCode: { fontSize: 12, color: "#6C6C70", marginTop: 1 },
+  barcodeCell: {
+    width: 96,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  barcodeImage: { width: 80, height: 40 },
+  noBarcode: { color: "#C7C7CC", fontSize: 15 },
   count: {
     width: 48,
     textAlign: "right",
