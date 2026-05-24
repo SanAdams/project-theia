@@ -70,7 +70,7 @@
   },
   {
     "name": "Chocolate All Butter Croissants",
-    "CIC Code": "94985713"
+    "CIC Code": "94981180"
   },
   {
     "name": "Mini All Butter Croissants",
@@ -106,7 +106,7 @@
     "CIC Code": "94982670"
   },
   {
-    "name": "Cinnamon Raisin",
+    "name": "Cinnamon Raisin Bagels",
     "CIC Code": "94982616"
   },
   {
@@ -114,7 +114,7 @@
     "CIC Code": "94986545"
   },
   {
-    "name": "Cheese Strawberry Bites",
+    "name": "Strawberry Cream Cheese Pastry Bites",
     "CIC Code": "94986548"
   },
   {
@@ -138,23 +138,23 @@
     "CIC Code": "94981792"
   },
   {
-    "name": "Blueberry",
+    "name": "Blueberry Muffins",
     "CIC Code": "94988805"
   },
   {
-    "name": "Cinnamon Chip",
+    "name": "Cinnamon Chip Muffins",
     "CIC Code": "94988205"
   },
   {
-    "name": "Lemon Poppy",
+    "name": "Lemon Poppy Muffins",
     "CIC Code": "94981729"
   },
   {
-    "name": "Bran",
+    "name": "Raising Bran Muffins",
     "CIC Code": "94988803"
   },
   {
-    "name": "Chocolate Dutch",
+    "name": "Chocolate Dutch Muffins",
     "CIC Code": "94984301"
   },
   {
@@ -178,15 +178,15 @@
     "CIC Code": "94981665"
   },
   {
-    "name": "Bear Claw",
+    "name": "Almond Bear Claws",
     "CIC Code": "94987175"
   },
   {
-    "name": "Bear Claw Apple",
+    "name": "Apple Bear Claw",
     "CIC Code": "94984956"
   },
   {
-    "name": "Bear Claw Bavarian Cr\u00e8me",
+    "name": "Bavarian Cr\u00e8me Bear Claw",
     "CIC Code": "94988462"
   },
   {
@@ -207,7 +207,7 @@
   },
   {
     "name": "English Muffin Bread Sliced",
-    "CIC Code": "94990817"
+    "CIC Code": "94990817"  
   },
   {
     "name": "Chocolate Chip Cookies",
@@ -250,7 +250,7 @@
     "CIC Code": "95104598"
   },
   {
-    "name": "Creme Brule Sandwich Cookies",
+    "name": "Creme Brulee Sandwich Cookies",
     "CIC Code": "95104590"
   },
   {
@@ -266,7 +266,7 @@
     "CIC Code": "94989370"
   },
   {
-    "name": "Choclate Chunk Cookies",
+    "name": "Chocolate Chunk Cookies 3oz",
     "CIC Code": "94980934"
   },
   {
@@ -278,11 +278,11 @@
     "CIC Code": "94981197"
   },
   {
-    "name": "Extreme Chocolate Chip Cookies",
+    "name": "Extreme Chocolate Chip Cookies 3oz",
     "CIC Code": "94981082"
   },
   {
-    "name": "Cranberry Oatmeal Cookies",
+    "name": "Cranberry Oatmeal Cookies 3oz",
     "CIC Code": "94981188"
   },
   {
@@ -1115,7 +1115,8 @@
   },
   {
     "name": "Pre-Iced Red Velvet Cake Slices",
-    "CIC Code": "94988380"
+    "CIC Code": "94988380",
+    "label": "1/2 Sheet Precut Red Velvet Cake Square with Cream Cheese Icing"
   },
   {
     "name": "Pre-Iced Cookies n Cream Cake Slices",
@@ -1136,7 +1137,7 @@
   {
     "name": "White 1/2 Sheet Cake",
     "CIC Code": "94983056"
-  },  
+  },
   {
     "name": "Carrot 1/2 Sheet Cake ",
     "CIC Code": "94989054"
@@ -1539,7 +1540,7 @@
   },
   {
     "name": "Larry & Terris Cake Topper 5",
-    "CIC Code": "95800275"      
+    "CIC Code": "95800275"
   },
   {
     "name": "Larry & Terris Cake Topper 7",
