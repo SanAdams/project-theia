@@ -32,6 +32,7 @@ _CROP_PADDING = (
     0.02  # extra 2% of image dimension added around each detected box region
 )
 _REGION_IOU_THRESHOLD = 0.5  # regions with IoU above this are considered duplicates
+_MIN_MATCH_LENGTH = 3  # ignore OCR fragments shorter than this
 
 
 def _get_client():
@@ -67,6 +68,8 @@ def _get_products() -> List[Product]:
 
 
 def _match_product(label: str) -> Optional[Product]:
+    if len(label) < _MIN_MATCH_LENGTH:
+        return None
     products = _get_products()
     if not products:
         return None
@@ -74,9 +77,9 @@ def _match_product(label: str) -> Optional[Product]:
     # Primary pass: match against label/name
     match_texts = [p.match_text for p in products]
     top = process.extract(label, match_texts, limit=5)
-    log.info("    Top matches for %r:", label)
+    log.debug("    Top matches for %r:", label)
     for text, score, _ in top:
-        log.info("      [%.1f%%] %s", score, text)
+        log.debug("      [%.1f%%] %s", score, text)
     result = process.extractOne(label, match_texts, score_cutoff=_MATCH_CUTOFF * 100)
     if result:
         return next(p for p in products if p.match_text == result[0])
@@ -90,7 +93,7 @@ def _match_product(label: str) -> Optional[Product]:
     )
     if not result:
         return None
-    log.info("    (matched via nickname %r)", result[0])
+    log.debug("    (matched via nickname %r)", result[0])
     return next(c[1] for c in candidates if c[0] == result[0])
 
 
@@ -142,7 +145,7 @@ def _match_full_image(client, image_bytes: bytes) -> List[Product]:
     )
     for d in all_lines:
         bb = d["Geometry"]["BoundingBox"]
-        log.info(
+        log.debug(
             "  [%.0f%%] %-40s  x=%.3f–%.3f  y=%.3f–%.3f",
             d["Confidence"],
             repr(d["DetectedText"]),
