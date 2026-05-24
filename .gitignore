@@ -36,5 +36,5 @@ web-build/
 
 # Misc
 backend/tests/test_images/
-backend/Order Inventory Guides Jan 2026.pdf
+backend/Order Guide.pdf
 backend/static/barcodes/*.png
