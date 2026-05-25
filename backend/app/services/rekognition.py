@@ -67,34 +67,26 @@ def _get_products() -> List[Product]:
     return _products
 
 
-def _match_product(label: str) -> Optional[Product]:
+def _match_product(label: str) -> Optional[tuple[Product, float]]:
     if len(label) < _MIN_MATCH_LENGTH:
         return None
     products = _get_products()
     if not products:
         return None
 
-    # Primary pass: match against label/name
-    match_texts = [p.match_text for p in products]
+    labeled = [p for p in products if p.label]
+    if not labeled:
+        return None
+
+    match_texts = [p.label for p in labeled]
     top = process.extract(label, match_texts, limit=5)
     log.debug("    Top matches for %r:", label)
     for text, score, _ in top:
         log.debug("      [%.1f%%] %s", score, text)
     result = process.extractOne(label, match_texts, score_cutoff=_MATCH_CUTOFF * 100)
     if result:
-        return next(p for p in products if p.match_text == result[0])
-
-    # Fallback pass: match against nicknames only if primary failed
-    candidates = [(nick, p) for p in products for nick in p.nicknames]
-    if not candidates:
-        return None
-    result = process.extractOne(
-        label, [c[0] for c in candidates], score_cutoff=_MATCH_CUTOFF * 100
-    )
-    if not result:
-        return None
-    log.debug("    (matched via nickname %r)", result[0])
-    return next(c[1] for c in candidates if c[0] == result[0])
+        return next(p for p in labeled if p.label == result[0]), result[1]
+    return None
 
 
 # ---------------------------------------------------------------------------
@@ -131,7 +123,22 @@ def _group_detections(detections) -> List[List[dict]]:
     return groups
 
 
-def _match_full_image(client, image_bytes: bytes) -> List[Product]:
+def _group_bbox(group) -> dict:
+    """Compute the union bounding box for a spatial group of text detections."""
+    left = min(d["Geometry"]["BoundingBox"]["Left"] for d in group)
+    top = min(d["Geometry"]["BoundingBox"]["Top"] for d in group)
+    right = max(
+        d["Geometry"]["BoundingBox"]["Left"] + d["Geometry"]["BoundingBox"]["Width"]
+        for d in group
+    )
+    bottom = max(
+        d["Geometry"]["BoundingBox"]["Top"] + d["Geometry"]["BoundingBox"]["Height"]
+        for d in group
+    )
+    return {"Left": left, "Top": top, "Width": right - left, "Height": bottom - top}
+
+
+def _match_full_image(client, image_bytes: bytes) -> tuple[List[Product], List[dict]]:
     """Current approach: DetectText on the full image with spatial grouping."""
     response = client.detect_text(Image={"Bytes": image_bytes})
 
@@ -159,19 +166,26 @@ def _match_full_image(client, image_bytes: bytes) -> List[Product]:
     log.info("Grouped into %d spatial cluster(s)", len(groups))
 
     matched = []
+    bboxes = []
     for i, group in enumerate(groups):
         texts = [d["DetectedText"] for d in group]
         log.info("  Group %d: %s", i + 1, texts)
+        bboxes.append(_group_bbox(group))
+        best_product, best_score = None, 0.0
         for det in group:
-            product = _match_product(det["DetectedText"])
-            if product:
-                log.info("    -> matched: %s (CIC %s)", product.name, product.cic_code)
-                matched.append(product)
-                break
+            result = _match_product(det["DetectedText"])
+            if result and result[1] > best_score:
+                best_product, best_score = result
+        if best_product:
+            log.info(
+                "    -> matched: %s (CIC %s)", best_product.name, best_product.cic_code
+            )
+            matched.append(best_product)
         else:
             log.info("    -> no product match")
+            matched.append(Product(name="Unknown", cic_code="--"))
 
-    return matched
+    return matched, bboxes
 
 
 # ---------------------------------------------------------------------------
@@ -230,7 +244,9 @@ def _crop_region(image_bytes: bytes, bb: dict) -> bytes:
     return buf.getvalue()
 
 
-def _match_from_crops(client, image_bytes: bytes, regions: List[dict]) -> List[Product]:
+def _match_from_crops(
+    client, image_bytes: bytes, regions: List[dict]
+) -> tuple[List[Product], List[dict]]:
     """Run DetectText on each cropped region and return one matched Product per box."""
     matched = []
     for i, bb in enumerate(regions):
@@ -243,15 +259,20 @@ def _match_from_crops(client, image_bytes: bytes, regions: List[dict]) -> List[P
         ]
         texts = [d["DetectedText"] for d in lines]
         log.info("  Box %d: %s", i + 1, texts)
+        best_product, best_score = None, 0.0
         for det in lines:
-            product = _match_product(det["DetectedText"])
-            if product:
-                log.info("    -> matched: %s (CIC %s)", product.name, product.cic_code)
-                matched.append(product)
-                break
+            result = _match_product(det["DetectedText"])
+            if result and result[1] > best_score:
+                best_product, best_score = result
+        if best_product:
+            log.info(
+                "    -> matched: %s (CIC %s)", best_product.name, best_product.cic_code
+            )
+            matched.append(best_product)
         else:
             log.info("    -> no product match")
-    return matched
+            matched.append(Product(name="Unknown", cic_code="--"))
+    return matched, regions
 
 
 # ---------------------------------------------------------------------------
@@ -259,10 +280,11 @@ def _match_from_crops(client, image_bytes: bytes, regions: List[dict]) -> List[P
 # ---------------------------------------------------------------------------
 
 
-def detect_box_labels(image_bytes: bytes) -> List[Product]:
+def detect_box_labels(image_bytes: bytes) -> tuple[List[Product], List[dict]]:
     """
     Two-pass: DetectLabels to find box regions, then DetectText on each crop.
     Falls back to full-image DetectText with spatial grouping if no regions found.
+    Returns (products, bboxes) where bboxes[i] is the normalized bounding box for products[i].
     """
     client = _get_client()
 
@@ -272,12 +294,12 @@ def detect_box_labels(image_bytes: bytes) -> List[Product]:
             "DetectLabels: %d box region(s) found — running per-crop DetectText",
             len(regions),
         )
-        matched = _match_from_crops(client, image_bytes, regions)
+        matched, bboxes = _match_from_crops(client, image_bytes, regions)
     else:
         log.info(
             "DetectLabels: no box regions found — falling back to full-image DetectText"
         )
-        matched = _match_full_image(client, image_bytes)
+        matched, bboxes = _match_full_image(client, image_bytes)
 
     log.info("Result: %d product(s) detected", len(matched))
-    return matched
+    return matched, bboxes
