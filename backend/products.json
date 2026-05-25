@@ -111,23 +111,28 @@
   },
   {
     "name": "Apple Pastry Bites",
-    "CIC Code": "94986545"
+    "CIC Code": "94986545",
+    "label": "SUGARED APPLE PASTRY BITE"
   },
   {
     "name": "Strawberry Cream Cheese Pastry Bites",
-    "CIC Code": "94986548"
+    "CIC Code": "94986548",
+    "label": "SUGARED STRAWBERRY CHEESE PASTRY BITE"
   },
   {
     "name": "Blueberry Bites",
-    "CIC Code": "94982070"
+    "CIC Code": "94982070",
+    "label": "SUGARED BLUEBERRY PASTRY BITE"
   },
   {
-    "name": "Pastry Bites Cherry",
-    "CIC Code": "94981015"
+    "name": "Cherry Pastry Bites",
+    "CIC Code": "94981015",
+    "label": "SUGARED CHERRY PASTRY BITE"
   },
   {
-    "name": "Pastry Bites Raspberry",
-    "CIC Code": "94986566"
+    "name": "Raspberry Pastry Bites",
+    "CIC Code": "94986566",
+    "label": "SUGARED RASPBERRY PASTRY BITE"
   },
   {
     "name": "Raspberry Danish Strip",
@@ -207,7 +212,7 @@
   },
   {
     "name": "English Muffin Bread Sliced",
-    "CIC Code": "94990817"  
+    "CIC Code": "94990817"
   },
   {
     "name": "Chocolate Chip Cookies",
@@ -299,7 +304,8 @@
   },
   {
     "name": "Apple Pie 9in",
-    "CIC Code": "94985582"
+    "CIC Code": "94985582",
+    "label": "9 APPLE PIE ES"
   },
   {
     "name": "Dutch Apple Pie 9in",
@@ -307,19 +313,23 @@
   },
   {
     "name": "Cherry Pie 9in",
-    "CIC Code": "94985476"
+    "CIC Code": "94985476",
+    "label": "9 CHERRY PIE ES"
   },
   {
     "name": "Marrionberry Pie 9in",
-    "CIC Code": "94985530"
+    "CIC Code": "94985530",
+    "label": "9 MARIONBERRY PIE ES"
   },
   {
     "name": "Peach Pie 9in ",
-    "CIC Code": "94985590"
+    "CIC Code": "94985590",
+    "label": "9 PEACH PIE ES"
   },
   {
     "name": "Strawberry Rhubarb Pie 9in",
-    "CIC Code": "94985523"
+    "CIC Code": "94985523",
+    "label": "9 STRAWBERRY RHubarb PIE ES"
   },
   {
     "name": "Ciabatta 4ct",
@@ -1091,7 +1101,8 @@
   },
   {
     "name": "Pre-Iced Carrot Cake Slices",
-    "CIC Code": "94987996"
+    "CIC Code": "94987996",
+    "label": "1/2 Sheet Precut Carrot Cake Square with Cream Cheese Icing"
   },
   {
     "name": "Pre-Iced Chocolate Fudge Cake Slices",
@@ -1124,7 +1135,8 @@
   },
   {
     "name": "White 1/2 Sheet Cake",
-    "CIC Code": "94983056"
+    "CIC Code": "94983056",
+    "label": "WHITE HALF SHEET CAKE LAYERS"
   },
   {
     "name": "Carrot 1/2 Sheet Cake ",
@@ -1136,7 +1148,8 @@
   },
   {
     "name": "Marble 1/2 Sheet Cake",
-    "CIC Code": "94983051"
+    "CIC Code": "94983051",
+    "label": "WHITE MARBLE HALF SHEET CAKE LAYERS"
   },
   {
     "name": "Square Pink Whites",
@@ -1244,7 +1257,8 @@
   },
   {
     "name": "Birthday Colossal Cake Slices",
-    "CIC Code": "94990835"
+    "CIC Code": "94990835",
+    "label": "COLOSSAL BIRTHDAY CAKE"
   },
   {
     "name": "Carrot Colossal Cake Slices",
@@ -1336,15 +1350,18 @@
   },
   {
     "name": "White Cupcakes",
-    "CIC Code": "94982015"
+    "CIC Code": "94982015",
+    "label": "WHITE CUPCAKE 1.25 oz"
   },
   {
     "name": "Jumbo Chocolate Cupcakes",
-    "CIC Code": "94980914"
+    "CIC Code": "94980914",
+    "label": "DEVIL'S FOOD CUPCAKES"
   },
   {
     "name": "Jumbo White Cupcakes",
-    "CIC Code": "94980987"
+    "CIC Code": "94980987",
+    "label": "WHITE CUPCAKES 4 oz"
   },
   {
     "name": "Celebration White 2Lyr 8in",
@@ -1380,7 +1397,8 @@
   },
   {
     "name": "Chuckanut Carrot Cheesecake",
-    "CIC Code": "94990085"
+    "CIC Code": "94990085",
+    "label": "Carrot Layered Cheesecake"
   },
   {
     "name": "New York Colossal Cheesecake (14 cut)",
@@ -1408,7 +1426,8 @@
   },
   {
     "name": "8in White Cake Round",
-    "CIC Code": "94983008"
+    "CIC Code": "94983008",
+    "label": "WHITE ROUND CAKE LAYERS 8"
   },
   {
     "name": "8in Chocolate Cake Round",
@@ -1416,7 +1435,8 @@
   },
   {
     "name": "5in White Cake Round",
-    "CIC Code": "94983046"
+    "CIC Code": "94983046",
+    "label": "WHITE ROUND LAYER CAKE 5"
   },
   {
     "name": "5in Chocolate Cake Round",
