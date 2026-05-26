@@ -8,8 +8,8 @@ Project Theia is an inventory scanning app that uses computer vision to count pr
 
 ## Last Session
 
-**Date:** 2026-05-22  
-**Note:** Built the barcode feature end-to-end: backend extracts and serves barcode images, ResultsScreen now shows the barcode column, keyExtractor bug fixed. Also added a home icon to the Results header and updated canonical product names. Working tree is clean — good stopping point.
+**Date:** 2026-05-25  
+**Note:** Updated products.json from Order Guide.pdf: fixed PDF path in parse_products.py, re-parsed the guide updating 33 CIC codes, restored canonical product names, and deduplicated from 482 to 425 entries. 62 new products from the guide still need manual name canonicalization. Match cutoff in rekognition.py bumped to 0.80.
 
 ## Setup Commands
 

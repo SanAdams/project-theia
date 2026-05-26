@@ -14,7 +14,7 @@ import re
 import json
 from pathlib import Path
 
-PDF_PATH = Path(__file__).parent.parent / "Order Inventory Guides Jan 2026.pdf"
+PDF_PATH = Path(__file__).parent.parent / "Order Guide.pdf"
 OUTPUT_PATH = Path(__file__).parent.parent / "products.json"
 
 COLUMN_MID = 306  # x midpoint splitting left / right columns

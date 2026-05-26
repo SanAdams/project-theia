@@ -17,7 +17,7 @@ _products: List[Product] | None = None
 _products_mtime: float = 0.0
 
 _PRODUCTS_PATH = Path(__file__).parent.parent.parent / "products.json"
-_MATCH_CUTOFF = 0.75
+_MATCH_CUTOFF = 0.80
 
 # Spatial grouping tolerances for full-image fallback (normalized 0-1 coordinates).
 # Raise _X_PAD if one box's text splits across multiple groups (overcounting).
