@@ -1,0 +1,27 @@
+[
+  {
+    "file": "images/photo_1_2026-05-26_22-15-10.jpg",
+    "expected": ["Mini Brownie Bites Bowl", "New York Bagel Dough"]
+  },
+  {
+    "file": "images/photo_3_2026-05-26_22-15-10.jpg",
+    "expected": [
+      "S Sel Brioche Hamburger Buns",
+      "Pre-Iced White Cake Slices",
+      "Butter Sliced Loaf Cake"
+    ]
+  },
+  {
+    "file": "images/IMG_20260526_221012_(6).jpg",
+    "expected": [
+      "Kaiser Rolls",
+      "Mini Chocolate Boston Donuts",
+      "Hero Hawaiian Rolls",
+      "Blackberry Snack Pie",
+      "Old Fashioned Donut Holes",
+      "5in Chocolate Cake Round",
+      "Take and Bake Roasted Garlic Loaf",
+      "La Rocca Tiramisu Cake"
+    ]
+  }
+]

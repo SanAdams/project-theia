@@ -1,5 +1,5 @@
 import boto3
-from rapidfuzz import process
+from rapidfuzz import fuzz, process
 from io import BytesIO
 import json
 import logging
@@ -18,6 +18,7 @@ _products_mtime: float = 0.0
 
 _PRODUCTS_PATH = Path(__file__).parent.parent.parent / "products.json"
 _MATCH_CUTOFF = 0.80
+_SCORER = fuzz.partial_ratio
 
 # Spatial grouping tolerances for full-image fallback (normalized 0-1 coordinates).
 # Raise _X_PAD if one box's text splits across multiple groups (overcounting).
@@ -33,6 +34,9 @@ _CROP_PADDING = (
 )
 _REGION_IOU_THRESHOLD = 0.5  # regions with IoU above this are considered duplicates
 _MIN_MATCH_LENGTH = 3  # ignore OCR fragments shorter than this
+_MIN_ALNUM_CHARS = (
+    3  # ignore OCR fragments with fewer than this many alphanumeric characters
+)
 
 
 def _get_client():
@@ -70,6 +74,8 @@ def _get_products() -> List[Product]:
 def _match_product(label: str) -> Optional[tuple[Product, float]]:
     if len(label) < _MIN_MATCH_LENGTH:
         return None
+    if sum(c.isalnum() for c in label) < _MIN_ALNUM_CHARS:
+        return None
     products = _get_products()
     if not products:
         return None
@@ -79,11 +85,13 @@ def _match_product(label: str) -> Optional[tuple[Product, float]]:
         return None
 
     match_texts = [p.label for p in labeled]
-    top = process.extract(label, match_texts, limit=5)
+    top = process.extract(label, match_texts, scorer=_SCORER, limit=5)
     log.debug("    Top matches for %r:", label)
     for text, score, _ in top:
         log.debug("      [%.1f%%] %s", score, text)
-    result = process.extractOne(label, match_texts, score_cutoff=_MATCH_CUTOFF * 100)
+    result = process.extractOne(
+        label, match_texts, scorer=_SCORER, score_cutoff=_MATCH_CUTOFF * 100
+    )
     if result:
         return next(p for p in labeled if p.label == result[0]), result[1]
     return None
@@ -303,3 +311,29 @@ def detect_box_labels(image_bytes: bytes) -> tuple[List[Product], List[dict]]:
 
     log.info("Result: %d product(s) detected", len(matched))
     return matched, bboxes
+
+
+def get_ocr_lines(image_bytes: bytes) -> List[str]:
+    """Return raw OCR LINE texts using the same pipeline as production, without matching.
+    Intended for eval tooling — lets scripts benchmark scorer combinations without
+    re-calling AWS for every run (results can be cached after the first call)."""
+    client = _get_client()
+    regions = _find_box_regions(client, image_bytes)
+    lines: List[str] = []
+    if regions:
+        for bb in regions:
+            crop_bytes = _crop_region(image_bytes, bb)
+            response = client.detect_text(Image={"Bytes": crop_bytes})
+            lines += [
+                d["DetectedText"]
+                for d in response["TextDetections"]
+                if d["Type"] == "LINE" and d["Confidence"] >= 80.0
+            ]
+    else:
+        response = client.detect_text(Image={"Bytes": image_bytes})
+        lines = [
+            d["DetectedText"]
+            for d in response["TextDetections"]
+            if d["Type"] == "LINE" and d["Confidence"] >= 80.0
+        ]
+    return lines

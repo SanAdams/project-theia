@@ -8,8 +8,8 @@ Project Theia is an inventory scanning app that uses computer vision to count pr
 
 ## Last Session
 
-**Date:** 2026-05-25  
-**Note:** Updated products.json from Order Guide.pdf: fixed PDF path in parse_products.py, re-parsed the guide updating 33 CIC codes, restored canonical product names, and deduplicated from 482 to 425 entries. 62 new products from the guide still need manual name canonicalization. Match cutoff in rekognition.py bumped to 0.80.
+**Date:** 2026-05-27  
+**Note:** Added multi-photo scanning to CameraScreen (queue UI, parallel scan, client-side merge). Fixed unknown-box grouping bug in mergeResults. Added minimum alphanumeric guard and switched fuzzy scorer to partial_ratio in rekognition.py. Built scorer eval harness in backend/scripts/eval/ with manifest-driven image tests and AWS result caching. Updated products.json with new labels. Next: add more photos to eval suite and continue cataloging labels.
 
 ## Setup Commands
 

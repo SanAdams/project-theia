@@ -38,3 +38,5 @@ web-build/
 backend/tests/test_images/
 backend/Order Guide.pdf
 backend/static/*
+backend/scripts/eval/cache/
+backend/scripts/eval/images/

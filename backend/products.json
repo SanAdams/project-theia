@@ -46,7 +46,8 @@
   },
   {
     "name": "Old Fashioned Donut Holes",
-    "CIC Code": "94982484"
+    "CIC Code": "94982484",
+    "label": "10-20oz Old Fash Donut Holes"
   },
   {
     "name": "Chocolate Frosted Donut Holes",
@@ -85,28 +86,28 @@
     "CIC Code": "94985563"
   },
   {
-    "name": "New York Bagels",
+    "name": "New York Bagel Dough",
     "CIC Code": "94982922",
     "label": "NEW YORK STYLE BAGEL DOUGH"
   },
   {
-    "name": "3 Berry Bagels",
+    "name": "3 Berry Bagel Dough",
     "CIC Code": "94982689"
   },
   {
-    "name": "Blueberry Bagels",
+    "name": "Blueberry Bagel Dough",
     "CIC Code": "94982917"
   },
   {
-    "name": "Multigrain Bagels",
+    "name": "Multigrain Bagel Dough",
     "CIC Code": "94980737"
   },
   {
-    "name": "Onion Bagels",
+    "name": "Onion Bagel Dough",
     "CIC Code": "94982670"
   },
   {
-    "name": "Cinnamon Raisin Bagels",
+    "name": "Cinnamon Raisin Bagel Dough",
     "CIC Code": "94982616"
   },
   {
@@ -164,11 +165,13 @@
   },
   {
     "name": "Apple Turnovers",
-    "CIC Code": "94982342"
+    "CIC Code": "94982342",
+    "label": "PRE-SUGAR APPLE TURNOVER"
   },
   {
     "name": "Cherry Turnovers",
-    "CIC Code": "94982394"
+    "CIC Code": "94982394",
+    "label": "PRE-SUGAR CHERRY TURNOVER"
   },
   {
     "name": "Bavarian Creme Turnovers",
@@ -200,7 +203,8 @@
   },
   {
     "name": "Potato White Wide Pan Sliced",
-    "CIC Code": "94990816"
+    "CIC Code": "94990816",
+    "label": "WHITE WIDE PAN 5/8 SLICED"
   },
   {
     "name": "Eight Grain Wide Pan Sliced",
@@ -220,34 +224,35 @@
   },
   {
     "name": "Mini Chocolate Boston Donuts",
-    "CIC Code": "95151669"
+    "CIC Code": "95151669",
+    "label": "Mini Chocolate Boston Donuts"
   },
   {
     "name": "Mini Raspberry Filled Donuts",
     "CIC Code": "95151971"
   },
   {
-    "name": "Chocolate Chip Cookies",
+    "name": "Chocolate Chip Cookie Dough",
     "CIC Code": "94987417"
   },
   {
-    "name": "M&M Cookies",
+    "name": "M&M Cookie Dough",
     "CIC Code": "94984441"
   },
   {
-    "name": "Oatmeal Cookies",
+    "name": "Oatmeal Cookie Dough",
     "CIC Code": "94984437"
   },
   {
-    "name": "Cowboy Cookies",
+    "name": "Cowboy Cookie Dough",
     "CIC Code": "94987946"
   },
   {
-    "name": "Brownie Cookies",
+    "name": "Brownie Cookie Dough",
     "CIC Code": "94988442"
   },
   {
-    "name": "Lemon Cookie",
+    "name": "Lemon Cookie Dough",
     "CIC Code": "94982437"
   },
   {
@@ -398,7 +403,13 @@
   },
   {
     "name": "Butter Sliced Loaf Cake",
-    "CIC Code": "94983234"
+    "CIC Code": "94983234",
+    "label": "CLASSIC SLICED LOAF CAKE"
+  },
+  {
+    "name": "Banana Nut Sliced Loaf Cake",
+    "CIC Code": "94983232",
+    "label": "BANANA NUT SLICED LOAF CAKE"
   },
   {
     "name": "Bolillo Rolls",
@@ -418,11 +429,13 @@
   },
   {
     "name": "Hero Hawaiian Rolls",
-    "CIC Code": "94985776"
+    "CIC Code": "94985776",
+    "label": "HERO HAWAIIAN ROLLS"
   },
   {
     "name": "Kaiser Rolls",
-    "CIC Code": "94988670"
+    "CIC Code": "94988670",
+    "label": "LARGE KAISER ROLLS"
   },
   {
     "name": "Miami Onion Rolls",
@@ -454,7 +467,8 @@
   },
   {
     "name": "S Sel Brioche Hamburger Buns",
-    "CIC Code": "94010433"
+    "CIC Code": "94010433",
+    "label": "Signature SELECT Brioche Hamburger Buns"
   },
   {
     "name": "St.Pierre Hamburger Buns w/Seasme",
@@ -525,11 +539,12 @@
     "CIC Code": "95020706"
   },
   {
-    "name": "Mini Brownie Bites",
-    "CIC Code": "95022366"
+    "name": "Mini Brownie Bites Bowl",
+    "CIC Code": "95022366",
+    "label": "OVERJOYED BROWNIE BITES BOWL - PLAIN"
   },
   {
-    "name": "Mini Powdered Brownie Bites",
+    "name": "Mini Powdered Brownie Bites Bowl",
     "CIC Code": "95022370"
   },
   {
@@ -614,7 +629,8 @@
   },
   {
     "name": "Take and Bake Roasted Garlic Loaf",
-    "CIC Code": "94011148"
+    "CIC Code": "94011148",
+    "label": "SIGNATURE SELECT BAKE AT HOME ROASTED GARLIC LOAF"
   },
   {
     "name": "Take and Bake Demi French Baguette",
@@ -1087,6 +1103,11 @@
     "CIC Code": "94988641"
   },
   {
+    "name": "Pre-Iced White Cake Slices",
+    "CIC Code": "94988379",
+    "label": "1/2 Sheet Precut White Cake Square with White Icing"
+  },
+  {
     "name": "Pre-Iced Cookies n Cream Cake Slices",
     "CIC Code": "94985254"
   },
@@ -1398,7 +1419,8 @@
   },
   {
     "name": "5in Chocolate Cake Round",
-    "CIC Code": "94983042"
+    "CIC Code": "94983042",
+    "label": "CHOCOLATE ROUND LAYER CAKE 5"
   },
   {
     "name": "Carrot Cake 5in",
@@ -1491,7 +1513,8 @@
   },
   {
     "name": "La Rocca Tiramisu Cake",
-    "CIC Code": "94986497"
+    "CIC Code": "94986497",
+    "label": "Tiramisu Cake"
   },
   {
     "name": "Spring Mix Sprinkles",
@@ -1531,7 +1554,8 @@
   },
   {
     "name": "Blackberry Snack Pie",
-    "CIC Code": "97100566"
+    "CIC Code": "97100566",
+    "label": "Signature Select Blackberry Snack Pie"
   },
   {
     "name": "Boston Creme Snack Pie",
