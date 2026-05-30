@@ -40,8 +40,7 @@ Two-pass approach:
 
 Matching is done by `_match_product`:
 
-- **Primary**: fuzzy match (rapidfuzz, 75% cutoff) against `product.match_text` — which is the `label` field if set, otherwise `name`
-- **Fallback**: fuzzy match against `nicknames` list, only if primary fails
+- **Primary**: fuzzy match (rapidfuzz, 80% cutoff) against `product.label`
 
 `_products` is cached in memory but re-read automatically when `products.json`'s mtime changes — no restart needed after catalog edits.
 
@@ -61,7 +60,6 @@ Array of objects:
 - `name` — canonical product name (Pascal case)
 - `CIC Code` — 8-digit identifier used in inventory systems
 - `label` — exact text printed on the box label; used for OCR matching instead of `name` when set
-- `nicknames` — fallback aliases (e.g. handwritten identifiers); only matched if `label`/`name` matching fails
 
 Parser: `backend/scripts/parse_products.py` regenerates from `Order Inventory Guides Jan 2026.pdf` using pdfplumber.
 
