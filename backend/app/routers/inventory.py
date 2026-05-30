@@ -1,6 +1,6 @@
 from fastapi import APIRouter, UploadFile, File, HTTPException
 from collections import Counter
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from pydantic import BaseModel
 from typing import List, Optional
@@ -11,6 +11,7 @@ from app.services.debug_annotator import annotate_scan
 
 BARCODES_DIR = Path(__file__).parent.parent.parent / "static" / "barcodes"
 DEBUG_DIR = Path(__file__).parent.parent.parent / "static" / "debug"
+MAX_DEBUG_IMAGES = 10
 
 router = APIRouter()
 
@@ -64,8 +65,11 @@ async def scan_image(file: UploadFile = File(...)):
 
     debug_image_url = None
     if matched_products and bboxes:
-        timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S_%f")
+        timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S_%f")
         DEBUG_DIR.mkdir(parents=True, exist_ok=True)
+        existing = sorted(DEBUG_DIR.glob("scan_*.jpg"))
+        while len(existing) >= MAX_DEBUG_IMAGES:
+            existing.pop(0).unlink()
         annotated = annotate_scan(image_bytes, matched_products, bboxes)
         debug_path = DEBUG_DIR / f"scan_{timestamp}.jpg"
         debug_path.write_bytes(annotated)
