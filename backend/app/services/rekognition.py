@@ -16,25 +16,24 @@ _client = None
 _products: List[Product] | None = None
 _products_mtime: float = 0.0
 
-_PRODUCTS_PATH = Path(__file__).parent.parent.parent / "products.json"
-_MATCH_CUTOFF = 0.80
-_SCORER = fuzz.partial_ratio
+PRODUCTS_PATH = Path(__file__).parent.parent.parent / "products.json"
+MATCH_CUTOFF = 80  # percentage (0–100), as expected by rapidfuzz score_cutoff
+SCORER = fuzz.partial_ratio
+MIN_TEXT_CONFIDENCE = 80.0  # minimum Rekognition confidence to trust an OCR line
 
 # Spatial grouping tolerances for full-image fallback (normalized 0-1 coordinates).
-# Raise _X_PAD if one box's text splits across multiple groups (overcounting).
-# Lower _X_PAD if adjacent boxes merge into one group (undercounting).
-_X_PAD = 0.005  # ~0.5% of image width — tight to keep adjacent boxes separate
-_Y_PAD = 0.04  # ~4% of image height — loose enough to span multi-line labels
+# Raise X_PAD if one box's text splits across multiple groups (overcounting).
+# Lower X_PAD if adjacent boxes merge into one group (undercounting).
+X_PAD = 0.005  # ~0.5% of image width — tight to keep adjacent boxes separate
+Y_PAD = 0.04  # ~4% of image height — loose enough to span multi-line labels
 
 # Box detection via DetectLabels
-_BOX_LABEL_NAMES = {"Box", "Cardboard", "Carton", "Container", "Package", "Packaging"}
-_DETECT_LABELS_MIN_CONFIDENCE = 60.0
-_CROP_PADDING = (
-    0.02  # extra 2% of image dimension added around each detected box region
-)
-_REGION_IOU_THRESHOLD = 0.5  # regions with IoU above this are considered duplicates
-_MIN_MATCH_LENGTH = 3  # ignore OCR fragments shorter than this
-_MIN_ALNUM_CHARS = (
+BOX_LABEL_NAMES = {"Box", "Cardboard", "Carton", "Container", "Package", "Packaging"}
+DETECT_LABELS_MIN_CONFIDENCE = 60.0
+CROP_PADDING = 0.02  # extra 2% of image dimension added around each detected box region
+REGION_IOU_THRESHOLD = 0.5  # regions with IoU above this are considered duplicates
+MIN_MATCH_LENGTH = 3  # ignore OCR fragments shorter than this
+MIN_ALNUM_CHARS = (
     3  # ignore OCR fragments with fewer than this many alphanumeric characters
 )
 
@@ -51,10 +50,18 @@ def _get_client():
 
 def _get_products() -> List[Product]:
     global _products, _products_mtime
-    mtime = _PRODUCTS_PATH.stat().st_mtime if _PRODUCTS_PATH.exists() else 0.0
+    try:
+        mtime = PRODUCTS_PATH.stat().st_mtime
+    except FileNotFoundError:
+        mtime = 0.0
     if _products is None or mtime != _products_mtime:
+        try:
+            data = json.loads(PRODUCTS_PATH.read_text())
+        except (FileNotFoundError, json.JSONDecodeError):
+            data = []
+        # Only stamp the mtime after a successful read so a failed read
+        # is retried on the next scan rather than getting stuck.
         _products_mtime = mtime
-        data = json.loads(_PRODUCTS_PATH.read_text()) if _PRODUCTS_PATH.exists() else []
         if data and isinstance(data[0], str):
             _products = [Product(name=item, cic_code="") for item in data]
         else:
@@ -71,29 +78,34 @@ def _get_products() -> List[Product]:
     return _products
 
 
-def _match_product(label: str) -> Optional[tuple[Product, float]]:
-    if len(label) < _MIN_MATCH_LENGTH:
+def _match_product(ocr_text: str) -> Optional[tuple[Product, float]]:
+    if len(ocr_text) < MIN_MATCH_LENGTH:
         return None
-    if sum(c.isalnum() for c in label) < _MIN_ALNUM_CHARS:
+    if sum(c.isalnum() for c in ocr_text) < MIN_ALNUM_CHARS:
         return None
     products = _get_products()
     if not products:
         return None
 
-    labeled = [p for p in products if p.label]
-    if not labeled:
+    # Only match against products with an explicit label — name-only entries are
+    # incomplete catalog entries that would increase false positives.
+    labeled_products = [product for product in products if product.label]
+    if not labeled_products:
         return None
 
-    match_texts = [p.label for p in labeled]
-    top = process.extract(label, match_texts, scorer=_SCORER, limit=5)
-    log.debug("    Top matches for %r:", label)
-    for text, score, _ in top:
-        log.debug("      [%.1f%%] %s", score, text)
-    result = process.extractOne(
-        label, match_texts, scorer=_SCORER, score_cutoff=_MATCH_CUTOFF * 100
-    )
-    if result:
-        return next(p for p in labeled if p.label == result[0]), result[1]
+    catalog_labels = [product.label for product in labeled_products]
+    top_matches = process.extract(ocr_text, catalog_labels, scorer=SCORER, limit=5)
+    log.debug("    Top matches for %r:", ocr_text)
+    for candidate_label, score, _ in top_matches:
+        log.debug("      [%.1f%%] %s", score, candidate_label)
+    if top_matches and top_matches[0][1] >= MATCH_CUTOFF:
+        best_label, score, _ = top_matches[0]
+        return (
+            next(
+                product for product in labeled_products if product.label == best_label
+            ),
+            score,
+        )
     return None
 
 
@@ -106,12 +118,12 @@ def _overlaps_group(bb, group) -> bool:
     for member in group:
         g = member["Geometry"]["BoundingBox"]
         x_overlap = (
-            bb["Left"] - _X_PAD < g["Left"] + g["Width"]
-            and bb["Left"] + bb["Width"] + _X_PAD > g["Left"]
+            bb["Left"] - X_PAD < g["Left"] + g["Width"]
+            and bb["Left"] + bb["Width"] + X_PAD > g["Left"]
         )
         y_overlap = (
-            bb["Top"] - _Y_PAD < g["Top"] + g["Height"]
-            and bb["Top"] + bb["Height"] + _Y_PAD > g["Top"]
+            bb["Top"] - Y_PAD < g["Top"] + g["Height"]
+            and bb["Top"] + bb["Height"] + Y_PAD > g["Top"]
         )
         if x_overlap and y_overlap:
             return True
@@ -151,12 +163,13 @@ def _match_full_image(client, image_bytes: bytes) -> tuple[List[Product], List[d
     response = client.detect_text(Image={"Bytes": image_bytes})
 
     all_lines = [d for d in response["TextDetections"] if d["Type"] == "LINE"]
-    detections = [d for d in all_lines if d["Confidence"] >= 80.0]
+    detections = [d for d in all_lines if d["Confidence"] >= MIN_TEXT_CONFIDENCE]
 
     log.info(
-        "Full-image DetectText: %d LINE detections, %d above 80%% confidence",
+        "Full-image DetectText: %d LINE detections, %d above %.0f%% confidence",
         len(all_lines),
         len(detections),
+        MIN_TEXT_CONFIDENCE,
     )
     for d in all_lines:
         bb = d["Geometry"]["BoundingBox"]
@@ -220,11 +233,11 @@ def _find_box_regions(client, image_bytes: bytes) -> List[dict]:
     """Call DetectLabels and return deduplicated bounding boxes for box-like instances."""
     response = client.detect_labels(
         Image={"Bytes": image_bytes},
-        MinConfidence=_DETECT_LABELS_MIN_CONFIDENCE,
+        MinConfidence=DETECT_LABELS_MIN_CONFIDENCE,
     )
     raw = []
     for label in response["Labels"]:
-        if label["Name"] in _BOX_LABEL_NAMES:
+        if label["Name"] in BOX_LABEL_NAMES:
             for inst in label.get("Instances", []):
                 raw.append((inst["Confidence"], inst["BoundingBox"]))
 
@@ -232,7 +245,7 @@ def _find_box_regions(client, image_bytes: bytes) -> List[dict]:
     raw.sort(key=lambda x: x[0], reverse=True)
     accepted: List[dict] = []
     for _, bb in raw:
-        if not any(_iou(bb, a) > _REGION_IOU_THRESHOLD for a in accepted):
+        if not any(_iou(bb, a) > REGION_IOU_THRESHOLD for a in accepted):
             accepted.append(bb)
 
     return accepted
@@ -242,10 +255,10 @@ def _crop_region(image_bytes: bytes, bb: dict) -> bytes:
     """Crop a bounding box region (with padding) from image_bytes, return as JPEG bytes."""
     img = Image.open(BytesIO(image_bytes)).convert("RGB")
     w, h = img.size
-    x0 = max(0, (bb["Left"] - _CROP_PADDING) * w)
-    y0 = max(0, (bb["Top"] - _CROP_PADDING) * h)
-    x1 = min(w, (bb["Left"] + bb["Width"] + _CROP_PADDING) * w)
-    y1 = min(h, (bb["Top"] + bb["Height"] + _CROP_PADDING) * h)
+    x0 = max(0, (bb["Left"] - CROP_PADDING) * w)
+    y0 = max(0, (bb["Top"] - CROP_PADDING) * h)
+    x1 = min(w, (bb["Left"] + bb["Width"] + CROP_PADDING) * w)
+    y1 = min(h, (bb["Top"] + bb["Height"] + CROP_PADDING) * h)
     crop = img.crop((x0, y0, x1, y1))
     buf = BytesIO()
     crop.save(buf, format="JPEG")
@@ -263,7 +276,7 @@ def _match_from_crops(
         lines = [
             d
             for d in response["TextDetections"]
-            if d["Type"] == "LINE" and d["Confidence"] >= 80.0
+            if d["Type"] == "LINE" and d["Confidence"] >= MIN_TEXT_CONFIDENCE
         ]
         texts = [d["DetectedText"] for d in lines]
         log.info("  Box %d: %s", i + 1, texts)
@@ -327,13 +340,13 @@ def get_ocr_lines(image_bytes: bytes) -> List[str]:
             lines += [
                 d["DetectedText"]
                 for d in response["TextDetections"]
-                if d["Type"] == "LINE" and d["Confidence"] >= 80.0
+                if d["Type"] == "LINE" and d["Confidence"] >= MIN_TEXT_CONFIDENCE
             ]
     else:
         response = client.detect_text(Image={"Bytes": image_bytes})
         lines = [
             d["DetectedText"]
             for d in response["TextDetections"]
-            if d["Type"] == "LINE" and d["Confidence"] >= 80.0
+            if d["Type"] == "LINE" and d["Confidence"] >= MIN_TEXT_CONFIDENCE
         ]
     return lines

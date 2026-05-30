@@ -13,7 +13,3 @@ class Product:
     @property
     def scan_code(self) -> str:
         return self.barcode if self.barcode else self.cic_code
-
-    @property
-    def match_text(self) -> str:
-        return self.label if self.label else self.name
