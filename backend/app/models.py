@@ -9,7 +9,3 @@ class Product:
     barcode: str = ""
     label: str = ""  # exact text printed on the box label; used for OCR matching
     nicknames: List[str] = field(default_factory=list)
-
-    @property
-    def scan_code(self) -> str:
-        return self.barcode if self.barcode else self.cic_code

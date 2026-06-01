@@ -1,5 +1,8 @@
+import logging
 from PIL import Image
 import io
+
+log = logging.getLogger(__name__)
 
 MAX_BYTES = 5 * 1024 * 1024  # Rekognition inline limit: 5 MB
 
@@ -21,4 +24,10 @@ def prepare_image(image_bytes: bytes) -> bytes:
             break
         quality -= 10
 
-    return output.getvalue()
+    result = output.getvalue()
+    if len(result) > MAX_BYTES:
+        log.warning(
+            "prepare_image: could not compress image below 5 MB (final size: %d bytes) — Rekognition may reject it",
+            len(result),
+        )
+    return result

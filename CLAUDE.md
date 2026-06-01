@@ -8,8 +8,8 @@ Project Theia is an inventory scanning app that uses computer vision to count pr
 
 ## Last Session
 
-**Date:** 2026-05-27  
-**Note:** Added multi-photo scanning to CameraScreen (queue UI, parallel scan, client-side merge). Fixed unknown-box grouping bug in mergeResults. Added minimum alphanumeric guard and switched fuzzy scorer to partial_ratio in rekognition.py. Built scorer eval harness in backend/scripts/eval/ with manifest-driven image tests and AWS result caching. Updated products.json with new labels. Next: add more photos to eval suite and continue cataloging labels.
+**Date:** 2026-05-31  
+**Note:** Continued Socratic code review: removed dead scaffolding (scan_code property, MIN_MATCH_LENGTH), dropped unreachable IoU guard, added logging for silent failures in debug_annotator and image_processor, moved test_detect_labels.py to scripts/. Code review session complete. Next: commit and continue cataloging product labels.
 
 ## Setup Commands
 
@@ -36,7 +36,7 @@ Two-pass approach:
 
 1. **DetectLabels** — finds box-like regions in the image (Box, Cardboard, Carton, etc.), deduplicates overlapping bounding boxes via IoU
 2. **DetectText per crop** — each region is cropped from the image (with 2% padding) and sent to Rekognition separately, so small labels fill more of the frame
-3. **Fallback** — if DetectLabels finds no regions, falls back to full-image DetectText with spatial grouping (`_X_PAD`/`_Y_PAD` tolerances)
+3. **Fallback** — if DetectLabels finds no regions, falls back to full-image DetectText with spatial grouping (`X_PAD`/`Y_PAD` tolerances)
 
 Matching is done by `_match_product`:
 
@@ -52,8 +52,7 @@ Array of objects:
 {
   "name": "Ring Donut",
   "CIC Code": "94981327",
-  "label": "READY TO FINISH RING YEAST-RAISED DONUT",
-  "nicknames": ["ring yeast", "ring raised"]
+  "label": "READY TO FINISH RING YEAST-RAISED DONUT"
 }
 ```
 

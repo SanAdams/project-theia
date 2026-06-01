@@ -1,9 +1,12 @@
+import logging
 from io import BytesIO
 from typing import List
 
 from PIL import Image, ImageDraw, ImageFont
 
 from app.models import Product
+
+log = logging.getLogger(__name__)
 
 _PALETTE = [
     "#FF3B30",
@@ -25,6 +28,9 @@ def _load_font(size: int):
             return ImageFont.truetype(name, size)
         except (IOError, OSError):
             continue
+    log.warning(
+        "No TrueType font found; falling back to bitmap default — debug text may look small"
+    )
     return ImageFont.load_default()
 
 

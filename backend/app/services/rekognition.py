@@ -32,7 +32,6 @@ BOX_LABEL_NAMES = {"Box", "Cardboard", "Carton", "Container", "Package", "Packag
 DETECT_LABELS_MIN_CONFIDENCE = 60.0
 CROP_PADDING = 0.02  # extra 2% of image dimension added around each detected box region
 REGION_IOU_THRESHOLD = 0.5  # regions with IoU above this are considered duplicates
-MIN_MATCH_LENGTH = 3  # ignore OCR fragments shorter than this
 MIN_ALNUM_CHARS = (
     3  # ignore OCR fragments with fewer than this many alphanumeric characters
 )
@@ -79,8 +78,6 @@ def _get_products() -> List[Product]:
 
 
 def _match_product(ocr_text: str) -> Optional[tuple[Product, float]]:
-    if len(ocr_text) < MIN_MATCH_LENGTH:
-        return None
     if sum(c.isalnum() for c in ocr_text) < MIN_ALNUM_CHARS:
         return None
     products = _get_products()
@@ -226,7 +223,7 @@ def _iou(a: dict, b: dict) -> float:
         return 0.0
     intersection = (ix2 - ix1) * (iy2 - iy1)
     union = a["Width"] * a["Height"] + b["Width"] * b["Height"] - intersection
-    return intersection / union if union > 0 else 0.0
+    return intersection / union
 
 
 def _find_box_regions(client, image_bytes: bytes) -> List[dict]:
