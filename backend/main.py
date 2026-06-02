@@ -7,7 +7,9 @@ from dotenv import load_dotenv
 from app.routers import inventory
 
 load_dotenv()
-logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s: %(message)s")
+logging.basicConfig(
+    level=logging.INFO, format="%(levelname)s %(name)s: %(message)s", force=True
+)
 logging.getLogger("app.services.rekognition").setLevel(
     getattr(logging, os.getenv("REKOGNITION_LOG_LEVEL", "INFO").upper(), logging.INFO)
 )
