@@ -739,7 +739,8 @@
   },
   {
     "name": "Chocolate Mini Cupcakes",
-    "CIC Code": "95250054"
+    "CIC Code": "95250054",
+    "label": "Overjoyed Chocolate Cupcakes"
   },
   {
     "name": "Variety Mini Cupcakes",
@@ -1357,7 +1358,7 @@
     "label": "White Cupcakes 4 Oz"
   },
   {
-    "name": "4in Lemon Tart)",
+    "name": "4in Lemon Tart",
     "CIC Code": "94980291",
     "label": "Lemon Tart Safeway"
   },
