@@ -1,5 +1,5 @@
 import boto3
-from rapidfuzz import fuzz, process
+from rapidfuzz import fuzz, process, utils
 from io import BytesIO
 import json
 import logging
@@ -91,7 +91,13 @@ def _match_product(ocr_text: str) -> Optional[tuple[Product, float]]:
         return None
 
     catalog_labels = [product.label for product in labeled_products]
-    top_matches = process.extract(ocr_text, catalog_labels, scorer=SCORER, limit=5)
+    top_matches = process.extract(
+        ocr_text,
+        catalog_labels,
+        scorer=SCORER,
+        limit=5,
+        processor=utils.default_process,
+    )
     log.debug("    Top matches for %r:", ocr_text)
     for candidate_label, score, _ in top_matches:
         log.debug("      [%.1f%%] %s", score, candidate_label)
