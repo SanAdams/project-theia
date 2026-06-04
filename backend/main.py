@@ -1,5 +1,6 @@
 import logging
 import os
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -7,14 +8,26 @@ from dotenv import load_dotenv
 from app.routers import inventory
 
 load_dotenv()
-logging.basicConfig(
-    level=logging.INFO, format="%(levelname)s %(name)s: %(message)s", force=True
-)
-logging.getLogger("app.services.rekognition").setLevel(
-    getattr(logging, os.getenv("REKOGNITION_LOG_LEVEL", "INFO").upper(), logging.INFO)
-)
 
-app = FastAPI(title="Project Theia API")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Configure after uvicorn has finished its own logging setup.
+    # Attaching directly to the "app" logger (parent of all our loggers)
+    # with propagate=False means uvicorn's root-logger config can't interfere.
+    handler = logging.StreamHandler()
+    handler.setFormatter(logging.Formatter("%(levelname)s %(name)s: %(message)s"))
+    log_level = getattr(
+        logging, os.getenv("REKOGNITION_LOG_LEVEL", "INFO").upper(), logging.INFO
+    )
+    app_log = logging.getLogger("app")
+    app_log.addHandler(handler)
+    app_log.setLevel(log_level)
+    app_log.propagate = False
+    yield
+
+
+app = FastAPI(title="Project Theia API", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
