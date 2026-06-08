@@ -1,4 +1,5 @@
 import axios from "axios";
+import * as ImageManipulator from "expo-image-manipulator";
 import { Platform } from "react-native";
 import { InventoryItem } from "../../App";
 
@@ -23,10 +24,25 @@ export interface ScanResult {
   total_boxes: number;
 }
 
-export async function scanImage(imageUri: string): Promise<ScanResult> {
+const HEIC_MIME_TYPES = new Set(["image/heic", "image/heif"]);
+
+async function normalizeUri(uri: string, mimeType?: string): Promise<string> {
+  if (!HEIC_MIME_TYPES.has(mimeType ?? "")) return uri;
+  const result = await ImageManipulator.manipulateAsync(uri, [], {
+    compress: 0.95,
+    format: ImageManipulator.SaveFormat.JPEG,
+  });
+  return result.uri;
+}
+
+export async function scanImage(
+  imageUri: string,
+  mimeType?: string,
+): Promise<ScanResult> {
   if (Platform.OS === "web") {
     // On web, use native browser fetch directly — axios's adapter has issues with
     // FormData uploads in the Metro/Expo web bundle (response.body undefined).
+    // Send as-is; backend handles HEIC conversion server-side.
     const blobRes = await fetch(imageUri);
     const blob = await blobRes.blob();
     const form = new FormData();
@@ -43,10 +59,11 @@ export async function scanImage(imageUri: string): Promise<ScanResult> {
     return res.json() as Promise<ScanResult>;
   }
 
-  // Native: React Native's FormData accepts the { uri, type, name } shape.
+  // Native: convert HEIC → JPEG before upload (smaller payload, correct MIME).
+  const uri = await normalizeUri(imageUri, mimeType);
   const formData = new FormData();
   formData.append("file", {
-    uri: imageUri,
+    uri,
     type: "image/jpeg",
     name: "scan.jpg",
   } as unknown as Blob);

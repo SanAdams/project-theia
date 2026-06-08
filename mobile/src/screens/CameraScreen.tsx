@@ -38,7 +38,9 @@ function mergeResults(results: ScanResult[]): ScanResult {
 }
 
 export default function CameraScreen() {
-  const [photoQueue, setPhotoQueue] = useState<string[]>([]);
+  const [photoQueue, setPhotoQueue] = useState<
+    { uri: string; mimeType?: string }[]
+  >([]);
   const [loading, setLoading] = useState(false);
   const navigation = useNavigation<NavigationProp>();
 
@@ -58,7 +60,11 @@ export default function CameraScreen() {
     });
 
     if (!result.canceled) {
-      setPhotoQueue((q) => [...q, result.assets[0].uri]);
+      const a = result.assets[0];
+      setPhotoQueue((q) => [
+        ...q,
+        { uri: a.uri, mimeType: a.mimeType ?? undefined },
+      ]);
     }
   };
 
@@ -70,7 +76,13 @@ export default function CameraScreen() {
     });
 
     if (!result.canceled) {
-      setPhotoQueue((q) => [...q, ...result.assets.map((a) => a.uri)]);
+      setPhotoQueue((q) => [
+        ...q,
+        ...result.assets.map((a) => ({
+          uri: a.uri,
+          mimeType: a.mimeType ?? undefined,
+        })),
+      ]);
     }
   };
 
@@ -81,7 +93,9 @@ export default function CameraScreen() {
   const handleScan = async () => {
     setLoading(true);
     try {
-      const results = await Promise.all(photoQueue.map(scanImage));
+      const results = await Promise.all(
+        photoQueue.map((item) => scanImage(item.uri, item.mimeType)),
+      );
       const { items, total_boxes } = mergeResults(results);
       setPhotoQueue([]);
       navigation.navigate("Results", { items, total: total_boxes });
@@ -107,9 +121,9 @@ export default function CameraScreen() {
           style={styles.queueScroll}
           contentContainerStyle={styles.queueContent}
         >
-          {photoQueue.map((uri, index) => (
+          {photoQueue.map((item, index) => (
             <View key={index} style={styles.thumbWrapper}>
-              <Image source={{ uri }} style={styles.thumb} />
+              <Image source={{ uri: item.uri }} style={styles.thumb} />
               <TouchableOpacity
                 style={styles.removeButton}
                 onPress={() => handleRemovePhoto(index)}
