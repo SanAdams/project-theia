@@ -125,7 +125,7 @@
     "label": "Sugared Strawberry Cheese Pastry Bite"
   },
   {
-    "name": "Blueberry Bites",
+    "name": "Blueberry Pastry Bites",
     "CIC Code": "94982070",
     "label": "Sugared Blueberry Pastry Bite"
   },
@@ -148,20 +148,30 @@
     "CIC Code": "94981792"
   },
   {
-    "name": "Cinnamon Chip Muffins",
+    "name": "Cherry Danish Strip",
+    "CIC Code": "94981795"
+  },
+  {
+    "name": "Blueberry Muffins 4ct",
+    "CIC Code": "94988805",
+    "label": "Blueberry Muffin With Natural & Artificial Flavor"
+  },
+  {
+    "name": "Cinnamon Chip Muffins 4ct",
     "CIC Code": "94988205"
   },
   {
-    "name": "Almond Poppy",
+    "name": "Almond Poppy Muffins 4ct",
     "CIC Code": "94988870"
   },
   {
-    "name": "Raising Bran Muffins",
+    "name": "Raising Bran Muffins 4ct",
     "CIC Code": "94988803"
   },
   {
-    "name": "Chocolate Dutch Muffins",
-    "CIC Code": "94984301"
+    "name": "Chocolate Double Dutch Muffins 4ct",
+    "CIC Code": "94984301",
+    "label": "Double Dutch Muffin"
   },
   {
     "name": "Schwartz Brothers Lemon Blueberry Scone",
@@ -208,7 +218,7 @@
   {
     "name": "Potato White Wide Pan Sliced",
     "CIC Code": "94990816",
-    "label": "White Wide Pan 5/8 Sliced"
+    "label": "White Wide Pan 5/8\" Sliced"
   },
   {
     "name": "Eight Grain Wide Pan Sliced",
@@ -237,19 +247,28 @@
   },
   {
     "name": "Chocolate Chip Cookie Dough",
-    "CIC Code": "94987417"
+    "CIC Code": "94987417",
+    "label": "1oz Chocolate Chip Cookie Dough"
   },
   {
     "name": "M&M Cookie Dough",
-    "CIC Code": "94984441"
+    "CIC Code": "94984441",
+    "label": "1oz Chocolate Chip with Mini Colored Pieces Cookie Dough"
+  },
+  {
+    "name": "Sugar Cookie Dough",
+    "CIC Code": "94984440",
+    "label": "1oz Sugar Cookie Dough"
   },
   {
     "name": "Oatmeal Cookie Dough",
-    "CIC Code": "94984437"
+    "CIC Code": "94984437",
+    "label": "TranSmart™ Oatmeal Raisin Cookie"
   },
   {
     "name": "Cowboy Cookie Dough",
-    "CIC Code": "94987946"
+    "CIC Code": "94987946",
+    "label": "1oz Cowboy Cookie Dough"
   },
   {
     "name": "Brownie Cookie Dough",
@@ -277,19 +296,28 @@
   },
   {
     "name": "Chocolate Chunk Cookies 3oz",
-    "CIC Code": "94980934"
+    "CIC Code": "94980934",
+    "label": "Chocolate Chunk Frozen Cookie Dough Bakery Department"
   },
   {
     "name": "Sugar Cookies 3oz",
-    "CIC Code": "94981197"
+    "CIC Code": "94981197",
+    "label": "Sugar Frozen Cookie Dough Bakery Department"
+  },
+  {
+    "name": "Rainbow Chip Cookies 3oz",
+    "CIC Code": "94981187",
+    "label": "Rainbow Chocolate Candy Frozen Cookie Dough Bakery Department"
   },
   {
     "name": "Extreme Chocolate Chip Cookies 3oz",
-    "CIC Code": "94981082"
+    "CIC Code": "94981082",
+    "label": "Chocolate Extreme Frozen Cookie Dough Bakery Department"
   },
   {
     "name": "Cranberry Oatmeal Cookies 3oz",
-    "CIC Code": "94981188"
+    "CIC Code": "94981188",
+    "label": "Cranberry  RaisinOatmeal Frozen Cookie Dough Bakery Department"
   },
   {
     "name": "TWO-BITE BROWNIE SNACK PACKS",
@@ -461,7 +489,8 @@
   },
   {
     "name": "White Frosted Cookies",
-    "CIC Code": "95100796"
+    "CIC Code": "95100796",
+    "label": "White Frosted Sugar Cookies"
   },
   {
     "name": "Kimberly Birthday Cake Frosted Cookies",
@@ -478,7 +507,13 @@
   },
   {
     "name": "St.Pierre Hamburger Buns w/Seasme",
-    "CIC Code": "94050111"
+    "CIC Code": "94050111",
+    "label": "Sesame Seed Brioche Burger Buns"
+  },
+  {
+    "name": "St.Pierre Brioche Hamburger Buns",
+    "CIC Code": "94011494",
+    "label": "Brioche Burger Buns"
   },
   {
     "name": "St.Pierre Hotdog Buns",
@@ -488,10 +523,7 @@
     "name": "S Sel Sliced Brioche Bread",
     "CIC Code": "94011246"
   },
-  {
-    "name": "St.Pierre Brioche Hamburger Buns",
-    "CIC Code": "94011494"
-  },
+
   {
     "name": "St.Pierre Brioche Slider Buns",
     "CIC Code": "94050189"
@@ -506,7 +538,8 @@
   },
   {
     "name": "Fruity Marshmallow Crispy Bites",
-    "CIC Code": "94983132"
+    "CIC Code": "94983132",
+    "label": "Fruity Crispy Bites"
   },
   {
     "name": "Chocolate Marshmallow Crispy Bites",
@@ -526,11 +559,20 @@
   },
   {
     "name": "Lemon Poppy Mini Muffins",
-    "CIC Code": "95150622"
+    "CIC Code": "95150622",
+    "label": "Lemon Poppy Muffins"
   },
   {
-    "name": "Blueberry Muffins",
+    "name": "Wild Blueberry Mini Muffins",
     "CIC Code": "95151400"
+  },
+  {
+    "name": "9ct Oreo Muffins",
+    "CIC Code": "95150019"
+  },
+  {
+    "name": "9ct Chips Ahoy Muffins",
+    "CIC Code": "95152354"
   },
   {
     "name": "Mini Palmiers",
@@ -542,7 +584,8 @@
   },
   {
     "name": "JD Brownie Bites",
-    "CIC Code": "95020706"
+    "CIC Code": "95020706",
+    "label": "24ct JD Brownie Bites"
   },
   {
     "name": "Mini Brownie Bites Bowl",
@@ -551,19 +594,12 @@
   },
   {
     "name": "Mini Powdered Brownie Bites Bowl",
-    "CIC Code": "95022370"
+    "CIC Code": "95022370",
+    "label": "Overjoyed Brownie Bites Bowl - Powdered"
   },
   {
     "name": "1/2 Sheet Brownie",
     "CIC Code": "94981835"
-  },
-  {
-    "name": "9ct Oreo Muffins",
-    "CIC Code": "95150019"
-  },
-  {
-    "name": "9ct Chips Ahoy Muffins",
-    "CIC Code": "95152354"
   },
   {
     "name": "Overjoyed Fudge Brownie Ice Cream Cake",
@@ -611,11 +647,13 @@
   },
   {
     "name": "Schwartz Brothers Fruit Danish",
-    "CIC Code": "95152391"
+    "CIC Code": "95152391",
+    "label": "Assorted Fruit Danish"
   },
   {
     "name": "SCHWARTZ BROTHERS BISCUITS",
-    "CIC Code": "95150735"
+    "CIC Code": "95150735",
+    "label": "Shortcake Sweet Biscuits"
   },
   {
     "name": "Mini Garlic 4CT",
@@ -770,7 +808,8 @@
   },
   {
     "name": "CCF Sandwich Bread",
-    "CIC Code": "94010668"
+    "CIC Code": "94010668",
+    "label": "Cheesecake Factory at Home Wheat Sandwich loaf"
   },
   {
     "name": "4 Cheese & Garlic Breadsticks",
@@ -826,27 +865,31 @@
   },
   {
     "name": "Cherry Mini Pie",
-    "CIC Code": "95022616"
+    "CIC Code": "95022616",
+    "label": "Overjoyed 4\" Cherry Pie"
   },
   {
     "name": "Pecan Mini Pie",
     "CIC Code": "95023217"
   },
   {
-    "name": "Pretzilla Soft Pretzel Bites Tub W/Cheese",
-    "CIC Code": "94100061"
+    "name": "Pretzilla Nacho Cheese Pretzel Bites",
+    "CIC Code": "94100061",
+    "label": "Prtzl Bite, 8-12.3oz Nacho Cheese Cup Tub"
   },
   {
-    "name": "Pretzilla Soft Pretzel Bite Tub",
-    "CIC Code": "94100464"
+    "name": "Pretzilla Cinnamon Pretzel Bites",
+    "CIC Code": "94100464",
+    "label": "Prtzl Cinnamon Bites, 8-10.5oz Tubs w/ 1.7oz Cream"
+  },
+  {
+    "name": "Pretzilla Soft Pretzel Bites",
+    "CIC Code": "94100464",
+    "label": "Pretzel Bites, 8-12.3oz TUBS, RT"
   },
   {
     "name": "Cream Cheese Filling",
     "CIC Code": "94100235"
-  },
-  {
-    "name": "Circle",
-    "CIC Code": "94992431"
   },
   {
     "name": "Smocky Maple",
@@ -1331,7 +1374,8 @@
   },
   {
     "name": "Untopped Chocolate Cream Pie",
-    "CIC Code": "94988295"
+    "CIC Code": "94988295",
+    "label": "Chocolate Cream Pie"
   },
   {
     "name": "Untopped Coconut Cream Pie",
@@ -1426,7 +1470,7 @@
   {
     "name": "8in White Cake Round",
     "CIC Code": "94983008",
-    "label": "White Round Cake Layers 8"
+    "label": "White Round Cake Layers 8\""
   },
   {
     "name": "8in Chocolate Cake Round",
@@ -1436,15 +1480,15 @@
   {
     "name": "5in White Cake Round",
     "CIC Code": "94983046",
-    "label": "White Round Layer Cake 5"
+    "label": "White Round Layer Cake 5\""
   },
   {
     "name": "5in Chocolate Cake Round",
     "CIC Code": "94983042",
-    "label": "Chocolate Round Layer Cake 5"
+    "label": "Chocolate Round Layer Cake 5\""
   },
   {
-    "name": "Carrot Cake 5in",
+    "name": "5in Carrot Cake Round",
     "CIC Code": "94984394"
   },
   {
@@ -1562,10 +1606,6 @@
     "CIC Code": "97150011"
   },
   {
-    "name": "JOSEPHS PITA GREEK STYLE",
-    "CIC Code": "96300480"
-  },
-  {
     "name": "Apple Snack Pie",
     "CIC Code": "97100561"
   },
@@ -1595,20 +1635,27 @@
     "CIC Code": "96300539"
   },
   {
-    "name": "Flax Omega (Lavash)",
-    "CIC Code": "96250189"
+    "name": "Joseph's Flax Lavash",
+    "CIC Code": "96250189",
+    "label": "Joseph's Flax Lavash"
   },
   {
     "name": "Joseph's Wheat Pita",
     "CIC Code": "96250187"
   },
   {
+    "name": "Josseph's Greek Style Pita",
+    "CIC Code": "96300480"
+  },
+  {
     "name": "Joseph's White Pita",
-    "CIC Code": "96250186"
+    "CIC Code": "96250186",
+    "label": "Joseph's Original White Pita"
   },
   {
     "name": "Joseph's Whole Wheat Pita",
-    "CIC Code": "96250126"
+    "CIC Code": "96250126",
+    "label": "Joseph's Flax Pita"
   },
   {
     "name": "Hero Tortillas",
@@ -1639,7 +1686,7 @@
     "CIC Code": "96100229"
   },
   {
-    "name": "OZERY BAKERY ROUNDS To Come… MORNING APPLE",
+    "name": "OZERY BAKERY ROUNDS MORNING APPLE",
     "CIC Code": "96100227"
   },
   {

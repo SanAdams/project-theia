@@ -195,11 +195,10 @@ def _match_full_image(client, image_bytes: bytes) -> tuple[List[Product], List[d
         texts = [d["DetectedText"] for d in group]
         log.info("  Group %d: %s", i + 1, texts)
         bboxes.append(_group_bbox(group))
-        best_product, best_score = None, 0.0
-        for det in group:
-            result = _match_product(det["DetectedText"])
-            if result and result[1] > best_score:
-                best_product, best_score = result
+        joined = " ".join(texts)
+        log.debug("  Joined OCR (group %d): %r", i + 1, joined)
+        result = _match_product(joined)
+        best_product, best_score = result if result else (None, 0.0)
         if best_product:
             log.info(
                 "    -> matched: %s (CIC %s)", best_product.name, best_product.cic_code
@@ -283,11 +282,10 @@ def _match_from_crops(
         ]
         texts = [d["DetectedText"] for d in lines]
         log.info("  Box %d: %s", i + 1, texts)
-        best_product, best_score = None, 0.0
-        for det in lines:
-            result = _match_product(det["DetectedText"])
-            if result and result[1] > best_score:
-                best_product, best_score = result
+        joined = " ".join(texts)
+        log.debug("  Joined OCR (box %d): %r", i + 1, joined)
+        result = _match_product(joined)
+        best_product, best_score = result if result else (None, 0.0)
         if best_product:
             log.info(
                 "    -> matched: %s (CIC %s)", best_product.name, best_product.cic_code

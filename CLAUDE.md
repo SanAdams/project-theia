@@ -8,8 +8,8 @@ Project Theia is an inventory scanning app that uses computer vision to count pr
 
 ## Last Session
 
-**Date:** 2026-05-31  
-**Note:** Continued Socratic code review: removed dead scaffolding (scan_code property, MIN_MATCH_LENGTH), dropped unreachable IoU guard, added logging for silent failures in debug_annotator and image_processor, moved test_detect_labels.py to scripts/. Code review session complete. Next: commit and continue cataloging product labels.
+**Date:** 2026-06-09  
+**Note:** Added full HEIC image format support end-to-end. Backend: installed pillow-heif, fixed the early-return fast-path bug in `prepare_image` that would pass raw HEIC bytes to Rekognition, wrote an eval confirming JPEG-95 is the right strategy (PNG converts to 9 MB, over Rekognition's 5 MB limit). Mobile: `expo-image-manipulator` normalizes HEIC→JPEG before upload, using `mimeType` from the picker asset instead of fragile URI extension sniffing. Next: test on an iOS device with a real HEIC photo from the library.
 
 ## Setup Commands
 
