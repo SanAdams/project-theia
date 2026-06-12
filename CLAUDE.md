@@ -8,8 +8,8 @@ Project Theia is an inventory scanning app that uses computer vision to count pr
 
 ## Last Session
 
-**Date:** 2026-06-09  
-**Note:** Added full HEIC image format support end-to-end. Backend: installed pillow-heif, fixed the early-return fast-path bug in `prepare_image` that would pass raw HEIC bytes to Rekognition, wrote an eval confirming JPEG-95 is the right strategy (PNG converts to 9 MB, over Rekognition's 5 MB limit). Mobile: `expo-image-manipulator` normalizes HEIC→JPEG before upload, using `mimeType` from the picker asset instead of fragile URI extension sniffing. Next: test on an iOS device with a real HEIC photo from the library.
+**Date:** 2026-06-12  
+**Note:** Fixed web layout bug in ResultsScreen where pagination controls rendered below the viewport fold. Root cause: `flex:1` maps to `flex-basis:0%` in CSS, overriding an explicit `height` — Yoga (native) treats height as authoritative but browsers don't. Fix: `flexBasis:"auto"` + `maxHeight` + `overflow:"hidden"` on the container, and `minHeight:0` on the list. Pagination (10 items/page, Prev/Next) now works on web and native.
 
 ## Setup Commands
 
@@ -97,6 +97,41 @@ Used by the native (Android) path only. The web client always connects to port 8
 When debugging upload or connectivity failures, **validate `.env` first**: ping or curl every configured host and IP before looking at any code. A stale IP is a common silent failure mode.
 
 Backend logs are verbose by design: every DetectText detection, spatial group, top-5 fuzzy match scores, and final result are logged to INFO. Watch the Backend terminal during scans to diagnose matching issues.
+
+## React Native Web layout gotchas (this app runs on web AND native)
+
+Yoga (native) and CSS (web) resolve flexbox differently. Code that is
+correct on iOS/Android can silently break in the browser:
+
+- `flex: 1` maps to CSS `flex: 1 1 0%`. flex-basis:0% **overrides
+  `height`** on the main axis in CSS (Yoga honors height). If an element
+  needs an explicit height on web, also set `flexBasis: "auto"`.
+- CSS flex children default to `min-height: auto` and won't shrink below
+  content size. Yoga defaults to 0. Scrollable flex children need
+  `minHeight: 0` to scroll internally on web.
+- Expo's web template sets `body { overflow: hidden }`. Overflowing
+  content is CLIPPED with no scrollbar — invisible elements may be
+  rendering fine, just below the fold.
+- Prefer `maxHeight` as a hard cap when bounding screens on web;
+  flex-grow cannot exceed it regardless of the ancestor chain.
+
+## Debugging protocol for layout/visibility bugs
+
+Do NOT propose a fix until you have measurements. In order:
+
+1. Prove the running bundle is the edited file: add a visible version
+   tag to on-screen text + a module-level console.log. If it doesn't
+   appear, stop — fix the build/import, not the layout.
+2. Log the inputs (dimensions, item counts, computed values) and add
+   `onLayout` probes to each structural element. Compare INTENDED size
+   vs RESOLVED size — the first mismatch names the culprit.
+3. On web, check the DOM: clientHeight vs scrollHeight and computed
+   overflow on html/body/#root.
+4. Only then propose a fix, and state which measurement it explains.
+
+If two consecutive fixes produce zero visual change, assume the wrong
+code is being served (cache, duplicate file, stale export) until proven
+otherwise.
 
 ## Architecture Reference
 
