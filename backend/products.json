@@ -24,7 +24,8 @@
   },
   {
     "name": "Pershing Donut",
-    "CIC Code": "94986856"
+    "CIC Code": "94986856",
+    "label": "Pershing Donut"
   },
   {
     "name": "Apple Fritter",
@@ -213,7 +214,8 @@
   },
   {
     "name": "Honey Wheat Wide Pan Sliced",
-    "CIC Code": "94990815"
+    "CIC Code": "94990815",
+    "label": "Honey Wheat Wide Pan 5/8\" Sliced"
   },
   {
     "name": "Potato White Wide Pan Sliced",
@@ -222,15 +224,18 @@
   },
   {
     "name": "Eight Grain Wide Pan Sliced",
-    "CIC Code": "94990814"
+    "CIC Code": "94990814",
+    "label": "Eight Grain Wide Pan 5/8\" Sliced"
   },
   {
     "name": "Rustic Sourdough Wide Pan Bread",
-    "CIC Code": "94990818"
+    "CIC Code": "94990818",
+    "label": "Rustic Sourdough Wide Pan 5/8\" Slice"
   },
   {
     "name": "English Muffin Bread Sliced",
-    "CIC Code": "94990817"
+    "CIC Code": "94990817",
+    "label": "Wheat Montana Bakery English Muffin Bread"
   },
   {
     "name": "Mini Caramel Custard Filled Donuts",
@@ -498,7 +503,8 @@
   },
   {
     "name": "Peanut Butter Cookie",
-    "CIC Code": "95104357"
+    "CIC Code": "95104357",
+    "label": "Peanut Butter Cup"
   },
   {
     "name": "S Sel Brioche Hamburger Buns",
@@ -768,7 +774,8 @@
   },
   {
     "name": "Ann Marie's Sugar Free Angel Food Cake",
-    "CIC Code": "95200187"
+    "CIC Code": "95200187",
+    "label": "SF Angel Food Ring Cake"
   },
   {
     "name": "Vanilla Mini Cupcakes",
@@ -1632,7 +1639,8 @@
   },
   {
     "name": "Ube Roll 12pk",
-    "CIC Code": "96300539"
+    "CIC Code": "96300539",
+    "label": "Love's Ube Rolls"
   },
   {
     "name": "Joseph's Flax Lavash",
