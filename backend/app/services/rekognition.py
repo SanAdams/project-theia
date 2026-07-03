@@ -5,7 +5,7 @@ import json
 import logging
 import os
 from pathlib import Path
-from typing import List, Optional
+from typing import List, NamedTuple, Optional
 from PIL import Image
 
 from app.models import Product
@@ -77,38 +77,67 @@ def _get_products() -> List[Product]:
     return _products
 
 
-def _match_product(ocr_text: str) -> Optional[tuple[Product, float]]:
-    if sum(c.isalnum() for c in ocr_text) < MIN_ALNUM_CHARS:
-        return None
-    products = _get_products()
-    if not products:
-        return None
+class MatchResult(NamedTuple):
+    """Outcome of matching one OCR text unit against the catalog.
 
-    # Only match against products with an explicit label — name-only entries are
-    # incomplete catalog entries that would increase false positives.
-    labeled_products = [product for product in products if product.label]
-    if not labeled_products:
-        return None
+    `product` is None when nothing cleared the cutoff (a correct abstention when no
+    product is present). `runner_up` and `margin` expose how close the second-best
+    candidate was — a thin margin is where false positives are born, so eval tooling
+    reports it even when a match was accepted."""
+
+    product: Optional[Product]
+    score: float
+    runner_up: float
+    margin: float
+
+
+def match_text(
+    ocr_text: str,
+    labeled_products: List[Product],
+    *,
+    scorer=SCORER,
+    cutoff: float = MATCH_CUTOFF,
+    min_alnum: int = MIN_ALNUM_CHARS,
+) -> MatchResult:
+    """Pure matcher shared by production and the eval harness.
+
+    Reads no module globals beyond the default arguments, so the eval can sweep
+    `scorer`/`cutoff` and can never silently diverge from what production runs.
+    `labeled_products` must already be filtered to entries with a `label`."""
+    if sum(c.isalnum() for c in ocr_text) < min_alnum or not labeled_products:
+        return MatchResult(None, 0.0, 0.0, 0.0)
 
     catalog_labels = [product.label for product in labeled_products]
     top_matches = process.extract(
         ocr_text,
         catalog_labels,
-        scorer=SCORER,
+        scorer=scorer,
         limit=5,
         processor=utils.default_process,
     )
+    if not top_matches:
+        return MatchResult(None, 0.0, 0.0, 0.0)
+
     log.debug("    Top matches for %r:", ocr_text)
-    for candidate_label, score, _ in top_matches:
-        log.debug("      [%.1f%%] %s", score, candidate_label)
-    if top_matches and top_matches[0][1] >= MATCH_CUTOFF:
-        best_label, score, _ = top_matches[0]
-        return (
-            next(
-                product for product in labeled_products if product.label == best_label
-            ),
-            score,
-        )
+    for candidate_label, candidate_score, _ in top_matches:
+        log.debug("      [%.1f%%] %s", candidate_score, candidate_label)
+
+    best_label, best_score, _ = top_matches[0]
+    runner_up = top_matches[1][1] if len(top_matches) > 1 else 0.0
+    margin = best_score - runner_up
+    if best_score >= cutoff:
+        product = next(p for p in labeled_products if p.label == best_label)
+        return MatchResult(product, best_score, runner_up, margin)
+    return MatchResult(None, best_score, runner_up, margin)
+
+
+def _match_product(ocr_text: str) -> Optional[tuple[Product, float]]:
+    # Only match against products with an explicit label — name-only entries are
+    # incomplete catalog entries that would increase false positives.
+    labeled_products = [product for product in _get_products() if product.label]
+    result = match_text(ocr_text, labeled_products)
+    if result.product is not None:
+        return (result.product, result.score)
     return None
 
 
@@ -161,8 +190,10 @@ def _group_bbox(group) -> dict:
     return {"Left": left, "Top": top, "Width": right - left, "Height": bottom - top}
 
 
-def _match_full_image(client, image_bytes: bytes) -> tuple[List[Product], List[dict]]:
-    """Current approach: DetectText on the full image with spatial grouping."""
+def _full_image_units(client, image_bytes: bytes) -> tuple[List[str], List[dict]]:
+    """DetectText on the full image, spatially group lines, and join each group into
+    the text unit that gets matched. Returns (joined_units, group_bboxes) so both
+    production matching and eval tooling consume the exact same units."""
     response = client.detect_text(Image={"Bytes": image_bytes})
 
     all_lines = [d for d in response["TextDetections"] if d["Type"] == "LINE"]
@@ -189,7 +220,7 @@ def _match_full_image(client, image_bytes: bytes) -> tuple[List[Product], List[d
     groups = _group_detections(detections)
     log.info("Grouped into %d spatial cluster(s)", len(groups))
 
-    matched = []
+    units = []
     bboxes = []
     for i, group in enumerate(groups):
         texts = [d["DetectedText"] for d in group]
@@ -197,6 +228,17 @@ def _match_full_image(client, image_bytes: bytes) -> tuple[List[Product], List[d
         bboxes.append(_group_bbox(group))
         joined = " ".join(texts)
         log.debug("  Joined OCR (group %d): %r", i + 1, joined)
+        units.append(joined)
+
+    return units, bboxes
+
+
+def _match_full_image(client, image_bytes: bytes) -> tuple[List[Product], List[dict]]:
+    """Current approach: DetectText on the full image with spatial grouping."""
+    units, bboxes = _full_image_units(client, image_bytes)
+
+    matched = []
+    for joined in units:
         result = _match_product(joined)
         best_product, best_score = result if result else (None, 0.0)
         if best_product:
@@ -267,11 +309,11 @@ def _crop_region(image_bytes: bytes, bb: dict) -> bytes:
     return buf.getvalue()
 
 
-def _match_from_crops(
-    client, image_bytes: bytes, regions: List[dict]
-) -> tuple[List[Product], List[dict]]:
-    """Run DetectText on each cropped region and return one matched Product per box."""
-    matched = []
+def _crop_units(client, image_bytes: bytes, regions: List[dict]) -> List[str]:
+    """Run DetectText on each cropped region and join its lines into one text unit per
+    box — the exact unit production matches. Shared with eval tooling via
+    `get_match_units` so the two never diverge in granularity."""
+    units = []
     for i, bb in enumerate(regions):
         crop_bytes = _crop_region(image_bytes, bb)
         response = client.detect_text(Image={"Bytes": crop_bytes})
@@ -284,6 +326,16 @@ def _match_from_crops(
         log.info("  Box %d: %s", i + 1, texts)
         joined = " ".join(texts)
         log.debug("  Joined OCR (box %d): %r", i + 1, joined)
+        units.append(joined)
+    return units
+
+
+def _match_from_crops(
+    client, image_bytes: bytes, regions: List[dict]
+) -> tuple[List[Product], List[dict]]:
+    """Run DetectText on each cropped region and return one matched Product per box."""
+    matched = []
+    for joined in _crop_units(client, image_bytes, regions):
         result = _match_product(joined)
         best_product, best_score = result if result else (None, 0.0)
         if best_product:
@@ -327,27 +379,17 @@ def detect_box_labels(image_bytes: bytes) -> tuple[List[Product], List[dict]]:
     return matched, bboxes
 
 
-def get_ocr_lines(image_bytes: bytes) -> List[str]:
-    """Return raw OCR LINE texts using the same pipeline as production, without matching.
-    Intended for eval tooling — lets scripts benchmark scorer combinations without
-    re-calling AWS for every run (results can be cached after the first call)."""
+def get_match_units(image_bytes: bytes) -> List[str]:
+    """Return the joined OCR text units production would match — one per detected box
+    crop, or one per spatial group in the full-image fallback — WITHOUT matching.
+
+    Intended for eval tooling: callers cache these units (after one AWS call) and feed
+    them to `match_text`, so the eval matches at the exact same granularity production
+    does. This deliberately replaces a raw per-line listing, which over-segments labels
+    and would mis-estimate both recall and false positives versus production."""
     client = _get_client()
     regions = _find_box_regions(client, image_bytes)
-    lines: List[str] = []
     if regions:
-        for bb in regions:
-            crop_bytes = _crop_region(image_bytes, bb)
-            response = client.detect_text(Image={"Bytes": crop_bytes})
-            lines += [
-                d["DetectedText"]
-                for d in response["TextDetections"]
-                if d["Type"] == "LINE" and d["Confidence"] >= MIN_TEXT_CONFIDENCE
-            ]
-    else:
-        response = client.detect_text(Image={"Bytes": image_bytes})
-        lines = [
-            d["DetectedText"]
-            for d in response["TextDetections"]
-            if d["Type"] == "LINE" and d["Confidence"] >= MIN_TEXT_CONFIDENCE
-        ]
-    return lines
+        return _crop_units(client, image_bytes, regions)
+    units, _ = _full_image_units(client, image_bytes)
+    return units

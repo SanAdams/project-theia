@@ -1,0 +1,8 @@
+{
+  "_comment": "Committed regression baseline for the FALSE-POSITIVE-FIRST gate (tests/test_eval_regression.py), measured with the PRODUCTION scorer+cutoff over cached/text/negative cases. 'fp' is a hard ceiling: any run with more false positives fails the test. 'recall' is advisory: a drop only warns, because becoming more conservative is acceptable. Re-baseline (lower fp and/or raise recall) after a deliberate scorer/cutoff change: re-run eval, then update these numbers.",
+  "scorer": "partial_ratio",
+  "cutoff": 80,
+  "fp": 0,
+  "recall_found": 6,
+  "recall_total": 14
+}

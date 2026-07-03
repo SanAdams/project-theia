@@ -1,0 +1,53 @@
+{
+  "_comment": "Eval dataset for label matching. THREE buckets: image_cases (real photos, OCR cached), text_cases (instant, no AWS), negative_cases (must match NOTHING). Add real cases with: python scripts/eval/capture.py <photo> [--negative]. image_cases are exhaustive by default (set partial:true to count recall only); text and negative cases are always exhaustive so false positives are measured.",
+  "image_cases": [
+    {
+      "file": "images/photo_1_2026-05-26_22-15-10.jpg",
+      "expected": ["Mini Brownie Bites Bowl", "New York Bagel Dough"],
+      "partial": true,
+      "note": "migrated from manifest.json; partial=true until all visible products are confirmed labeled, then flip to false to measure false positives here"
+    },
+    {
+      "file": "images/photo_3_2026-05-26_22-15-10.jpg",
+      "expected": [
+        "S Sel Brioche Hamburger Buns",
+        "Pre-Iced White Cake Slices",
+        "Butter Sliced Loaf Cake"
+      ],
+      "partial": true,
+      "note": "migrated from manifest.json; confirm exhaustiveness then set partial=false"
+    },
+    {
+      "file": "images/IMG_20260526_221012_(6).jpg",
+      "expected": [
+        "Kaiser Rolls",
+        "Mini Chocolate Boston Donuts",
+        "Hero Hawaiian Rolls",
+        "Blackberry Snack Pie",
+        "Old Fashioned Donut Holes",
+        "5in Chocolate Cake Round",
+        "Take and Bake Roasted Garlic Loaf",
+        "La Rocca Tiramisu Cake"
+      ],
+      "partial": true,
+      "note": "migrated from manifest.json; crowded shelf \u2014 likely stays partial"
+    }
+  ],
+  "text_cases": [
+    {
+      "ocr": "Signature Select 21130-30333 Lemon Snack Pie Net Wt. 192.0 oz 4/12/4.0 oz DISTRIBUTED BY BETTER LIVING BRANDS LLC P.O.BOX 99, PLEASANTON,CA 94566-009 Frozen foods-store below 32F Best if used by 08/24/26 6110 Made in the USA 10021130303332",
+      "expected": ["Lemon Snack Pie"],
+      "note": "EXEMPLAR of failure class 'inserted code/number splits a contiguous-phrase label': the CIC code between 'Signature Select' and 'Lemon Snack Pie' makes partial_ratio match only the prefix and abstain, while token_set_ratio matches at 100%. Add more cases of this class rather than special-casing this one product."
+    }
+  ],
+  "negative_cases": [
+    {
+      "ocr": "GREAT VALUE CONCENTRATED BLEACH 121 FL OZ KEEP OUT OF REACH OF CHILDREN DANGER",
+      "note": "synthetic seed: cleaning product, not in catalog \u2014 must match nothing"
+    },
+    {
+      "ocr": "MIXED PALLET 4873 LOT 99214 KEEP FROZEN STORE AT 0F THIS SIDE UP FRAGILE HANDLE WITH CARE",
+      "note": "synthetic seed: shipping/pallet label, not a product \u2014 must match nothing"
+    }
+  ]
+}
