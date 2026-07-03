@@ -38,10 +38,6 @@
     "label": "Simply Beignet Aux Oeufs Frais Tout"
   },
   {
-    "name": "Churro Donut",
-    "CIC Code": "94981894"
-  },
-  {
     "name": "Powdered Donut Holes",
     "CIC Code": "94982337"
   },
@@ -65,7 +61,7 @@
   {
     "name": "(Franz) Old Fashioned Donut 12ct",
     "CIC Code": "94982622",
-    "label":"Old Fashion Glaze Donuts"
+    "label": "Old Fashion Glaze Donuts"
   },
   {
     "name": "Jumbo All Butter Croissants",
@@ -104,19 +100,23 @@
   },
   {
     "name": "Blueberry Bagel Dough",
-    "CIC Code": "94982917"
+    "CIC Code": "94982917",
+    "label": "Blueberry Naturally and Artificially Flavored Bagel Dough"
   },
   {
     "name": "Multigrain Bagel Dough",
-    "CIC Code": "94980737"
+    "CIC Code": "94980737",
+    "label": "Multigrain Bagel Dough"
   },
   {
     "name": "Onion Bagel Dough",
-    "CIC Code": "94982670"
+    "CIC Code": "94982670",
+    "label": "Onion Bagel Dough"
   },
   {
     "name": "Cinnamon Raisin Bagel Dough",
-    "CIC Code": "94982616"
+    "CIC Code": "94982616",
+    "label": "Cinnamon Raisin Bagel Dough"
   },
   {
     "name": "Apple Pastry Bites",
@@ -604,15 +604,17 @@
   },
   {
     "name": "Wild Blueberry Mini Muffins",
-    "CIC Code": "95151400"
+    "CIC Code": "95151400",
+    "label": "Wild Blueberry Muffins"
   },
   {
-    "name": "9ct Oreo Muffins",
+    "name": "Oreo Muffins Mini Muffins",
     "CIC Code": "95150019"
   },
   {
-    "name": "9ct Chips Ahoy Muffins",
-    "CIC Code": "95152354"
+    "name": "Chips Ahoy Mini Muffins",
+    "CIC Code": "95152354",
+    "label": "Chips Ahoy Muffins"
   },
   {
     "name": "Mini Palmiers",
@@ -653,7 +655,7 @@
   {
     "name": "Overjoyed Chocolate Ice Cream Cake 1/4 Sheet",
     "CIC Code": "95450025",
-    "label":"1/4 Sheet Vanilla & Chocolate Ice Cream Cake"
+    "label": "1/4 Sheet Vanilla & Chocolate Ice Cream Cake"
   },
   {
     "name": "Overjoyed White Ice Cream Cake",
@@ -721,7 +723,8 @@
   },
   {
     "name": "Take and Bake Demi French Baguette",
-    "CIC Code": "94011138"
+    "CIC Code": "94011138",
+    "label": "Signature Select Bake At Home French Demi Baguettes"
   },
   {
     "name": "Take and Bake Sourdough Loaf",
@@ -738,11 +741,13 @@
   },
   {
     "name": "Schwartz Brothers Croissant Bread",
-    "CIC Code": "94012732"
+    "CIC Code": "94012732",
+    "label": "Schwartz Brothers Croissant Bread"
   },
   {
     "name": "Schwartz Brothers Cinnamon Croissant Bread",
-    "CIC Code": "95151728"
+    "CIC Code": "95151728",
+    "label": "Schwartz Brothers Cinnamon Croissant Bread"
   },
   {
     "name": "Schwartz Brothers Cinnamon Strussel Coffee Cake",
@@ -798,7 +803,8 @@
   },
   {
     "name": "7 Layer Square",
-    "CIC Code": "95104773"
+    "CIC Code": "95104773",
+    "label": "Overjoyed 7-Layer Square - 9ct"
   },
   {
     "name": "Lemon Square",
@@ -1465,11 +1471,11 @@
     "label": "Lemon Tart Safeway"
   },
   {
-    "name": "Celebration White 2Lyr 8in",
+    "name": "Golden Celebration Vanilla 2 Layer 8in Cake",
     "CIC Code": "94983553"
   },
   {
-    "name": "Celebration Chocolate 2Lyr 8in",
+    "name": "Golden Celebration Chocolate 2 Layer 8in Cake",
     "CIC Code": "94983555"
   },
   {
@@ -1719,15 +1725,18 @@
   },
   {
     "name": "Hero Tortillas",
-    "CIC Code": "96300488"
+    "CIC Code": "96300488",
+    "label": "Hero Tortillas One Net Carb"
   },
   {
     "name": "Hero Hamburger Buns",
-    "CIC Code": "96300082"
+    "CIC Code": "96300082",
+    "label": "Hero Classic Burger Buns"
   },
   {
     "name": "Hero Hot Dog Buns",
-    "CIC Code": "96300104"
+    "CIC Code": "96300104",
+    "label": "Hero Classic Hot Dog Buns"
   },
   {
     "name": "Hero White Bread",
@@ -1819,7 +1828,7 @@
     "CIC Code": "95300170"
   },
   {
-    "name": "Chocolaet Chip Cookie Dough Cup",
+    "name": "Chocolate Chip Cookie Dough Cup",
     "CIC Code": "95101117"
   },
   {
