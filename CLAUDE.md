@@ -38,9 +38,7 @@ Two-pass approach:
 2. **DetectText per crop** — each region is cropped from the image (with 2% padding) and sent to Rekognition separately, so small labels fill more of the frame
 3. **Fallback** — if DetectLabels finds no regions, falls back to full-image DetectText with spatial grouping (`X_PAD`/`Y_PAD` tolerances)
 
-Matching is done by `_match_product`:
-
-- **Primary**: fuzzy match (rapidfuzz, 80% cutoff) against `product.label`
+Matching is done by `_match_product`: fuzzy match (rapidfuzz, 80% cutoff) against `product.label`. Products with no `label` set are excluded from the candidate pool entirely — there is no fallback to `name`, so those products can never be matched by OCR until a `label` is added.
 
 `_products` is cached in memory but re-read automatically when `products.json`'s mtime changes — no restart needed after catalog edits.
 
@@ -58,7 +56,7 @@ Array of objects:
 
 - `name` — canonical product name (Pascal case)
 - `CIC Code` — 8-digit identifier used in inventory systems
-- `label` — exact text printed on the box label; used for OCR matching instead of `name` when set
+- `label` — exact text printed on the box label; **required for OCR matching** — `_match_product` only matches against `product.label` and excludes products with no `label` from the candidate pool entirely (no fallback to `name`)
 
 Parser: `backend/scripts/parse_products.py` regenerates from `Order Inventory Guides Jan 2026.pdf` using pdfplumber.
 
