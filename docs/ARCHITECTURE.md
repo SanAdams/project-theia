@@ -33,11 +33,12 @@ A photo of a commercial freezer enters the system as raw image bytes. The pipeli
 - Sorts candidates by confidence descending, then deduplicates: any box whose IoU with an already-accepted box exceeds `_REGION_IOU_THRESHOLD` (0.5) is dropped.
 
 **Key constants:**
-| Constant | Value | Effect |
-|---|---|---|
-| `_DETECT_LABELS_MIN_CONFIDENCE` | 60.0 | Lower = more regions found, more noise |
-| `_REGION_IOU_THRESHOLD` | 0.5 | Lower = stricter deduplication |
-| `_CROP_PADDING` | 0.02 | Extra 2% image dimension added around each crop |
+
+| Constant                        | Value | Effect                                          |
+| ------------------------------- | ----- | ----------------------------------------------- |
+| `_DETECT_LABELS_MIN_CONFIDENCE` | 60.0  | Lower = more regions found, more noise          |
+| `_REGION_IOU_THRESHOLD`         | 0.5   | Lower = stricter deduplication                  |
+| `_CROP_PADDING`                 | 0.02  | Extra 2% image dimension added around each crop |
 
 ---
 
