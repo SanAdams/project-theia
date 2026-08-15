@@ -26,7 +26,7 @@ import fitz  # pymupdf
 from PIL import Image
 
 BASE_DIR = Path(__file__).parent.parent
-PDF_PATH = BASE_DIR / "Order Inventory Guides Jan 2026.pdf"
+PDF_PATH = BASE_DIR / "Order Guide.pdf"
 PRODUCTS_PATH = BASE_DIR / "products.json"
 OUTPUT_DIR = BASE_DIR / "static" / "barcodes"
 
