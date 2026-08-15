@@ -3,70 +3,39 @@
 Compare HEIC-to-Rekognition conversion strategies for product matching.
 
 Converts the HEIC test image three ways — PNG (lossless), JPEG-95, JPEG-85 —
-then calls get_ocr_lines() for each (AWS-cached by MD5 of converted bytes,
-same pattern as eval_matching.py) and runs product matching with the current
-WRatio scorer at cutoff 80.
+then runs the PRODUCTION OCR + matching pipeline on each (via harness.py) so the
+comparison reflects exactly what production would extract and match. Uses the
+production scorer/cutoff, not a hardcoded one (previously this drifted to WRatio
+while production ran partial_ratio).
 
-AWS calls (first run only): get_ocr_lines() makes 1 DetectLabels + N DetectText
-calls per strategy, where N is the number of detected box regions. Results are
-cached — subsequent runs cost nothing.
+OCR is cached by hash(converted bytes + pipeline version); subsequent runs cost nothing.
 
 Usage:
     cd backend
     python scripts/eval/eval_heic_formats.py
 """
 
-import hashlib
 import io
-import json
 import sys
 from pathlib import Path
 
 import pillow_heif
 from PIL import Image
 
-SCRIPT_DIR = Path(__file__).parent
-BACKEND_DIR = SCRIPT_DIR.parent.parent
-sys.path.insert(0, str(BACKEND_DIR))
+from harness import (
+    BACKEND_DIR,
+    get_cached_units,
+    load_catalog,
+    save_cached_units,
+)
 
-from dotenv import load_dotenv
-
-load_dotenv(BACKEND_DIR / ".env")
+from app.services.rekognition import get_match_units, match_text
 
 pillow_heif.register_heif_opener()
 
-from rapidfuzz import fuzz, process
-
-from app.services.rekognition import get_ocr_lines
-
 HEIC_PATH = BACKEND_DIR / "tests" / "test_images" / "IMG_20260526_221011 (4) (1).heic"
-CACHE_DIR = SCRIPT_DIR / "cache"
-PRODUCTS_PATH = BACKEND_DIR / "products.json"
-CUTOFF = 80.0
 STRATEGIES = ["png", "jpeg-95", "jpeg-85"]
-
-
-def load_catalog() -> tuple[list[str], dict[str, str]]:
-    data = json.loads(PRODUCTS_PATH.read_text())
-    labeled = [(p["name"], p["label"]) for p in data if p.get("label")]
-    labels = [label for _, label in labeled]
-    name_by_label = {label: name for name, label in labeled}
-    return labels, name_by_label
-
-
-def _cache_path(image_bytes: bytes) -> Path:
-    return CACHE_DIR / f"{hashlib.md5(image_bytes).hexdigest()}.json"
-
-
-def get_cached_ocr(image_bytes: bytes) -> list[str] | None:
-    CACHE_DIR.mkdir(exist_ok=True)
-    cp = _cache_path(image_bytes)
-    return json.loads(cp.read_text()) if cp.exists() else None
-
-
-def save_cached_ocr(image_bytes: bytes, lines: list[str]) -> None:
-    CACHE_DIR.mkdir(exist_ok=True)
-    _cache_path(image_bytes).write_text(json.dumps(lines))
+MAX_BYTES = 5 * 1024 * 1024
 
 
 def convert(heic_bytes: bytes, strategy: str) -> bytes:
@@ -83,18 +52,23 @@ def convert(heic_bytes: bytes, strategy: str) -> bytes:
     return buf.getvalue()
 
 
-def match_all(
-    ocr_lines: list[str], labels: list[str], name_by_label: dict[str, str]
-) -> set[str]:
+def units_for_bytes(converted: bytes) -> list[str]:
+    """Cached production match-units for already-converted image bytes."""
+    cached = get_cached_units(converted)
+    if cached is not None:
+        return cached
+    units = get_match_units(converted)
+    save_cached_units(converted, units)
+    return units
+
+
+def match_all(units: list[str], labeled) -> set[str]:
+    """Match using the PRODUCTION scorer/cutoff (match_text defaults)."""
     matched: set[str] = set()
-    for line in ocr_lines:
-        if sum(c.isalnum() for c in line) < 3:
-            continue
-        result = process.extractOne(
-            line, labels, scorer=fuzz.WRatio, score_cutoff=CUTOFF
-        )
-        if result:
-            matched.add(name_by_label[result[0]])
+    for unit in units:
+        r = match_text(unit, labeled)
+        if r.product is not None:
+            matched.add(r.product.name)
     return matched
 
 
@@ -106,44 +80,38 @@ def main() -> None:
     raw = HEIC_PATH.read_bytes()
     print(f"Source: {HEIC_PATH.name}  ({len(raw) / 1024:.1f} KB HEIC)")
 
-    labels, name_by_label = load_catalog()
-    print(f"Catalog: {len(labels)} labeled products\n")
+    labeled, _ = load_catalog()
+    print(f"Catalog: {len(labeled)} labeled products\n")
 
-    MAX_BYTES = 5 * 1024 * 1024
     results: dict[str, dict] = {}
     for strategy in STRATEGIES:
         converted = convert(raw, strategy)
         size_kb = len(converted) / 1024
 
         if len(converted) > MAX_BYTES:
-            print(
-                f"  [{strategy}]  {size_kb:.1f} KB — EXCEEDS 5 MB LIMIT, skipping AWS call"
-            )
-            results[strategy] = {
-                "size_kb": size_kb,
-                "lines": None,
-                "matched": None,
-            }
+            print(f"  [{strategy}]  {size_kb:.1f} KB — EXCEEDS 5 MB LIMIT, skipping")
+            results[strategy] = {"size_kb": size_kb, "units": None, "matched": None}
             continue
 
-        lines = get_cached_ocr(converted)
-        if lines is None:
+        cached = get_cached_units(converted)
+        if cached is None:
             print(f"  [{strategy}]  {size_kb:.1f} KB — calling AWS...")
-            lines = get_ocr_lines(converted)
-            save_cached_ocr(converted, lines)
-            print(f"    -> {len(lines)} OCR lines, cached")
+            units = units_for_bytes(converted)
+            print(f"    -> {len(units)} match units, cached")
         else:
-            print(f"  [{strategy}]  {size_kb:.1f} KB — {len(lines)} lines (cached)")
+            units = cached
+            print(f"  [{strategy}]  {size_kb:.1f} KB — {len(units)} units (cached)")
 
         results[strategy] = {
             "size_kb": size_kb,
-            "lines": lines,
-            "matched": match_all(lines, labels, name_by_label),
+            "units": units,
+            "matched": match_all(units, labeled),
         }
 
-    # Comparison table — only strategies that fit within the 5 MB limit
     viable = {s: r for s, r in results.items() if r["matched"] is not None}
-    all_products = sorted(set().union(*(r["matched"] for r in viable.values())))
+    all_products = (
+        sorted(set().union(*(r["matched"] for r in viable.values()))) if viable else []
+    )
 
     print("\n" + "=" * 70)
     print("PRODUCT MATCH COMPARISON  (strategies over 5 MB skipped)")
@@ -159,7 +127,7 @@ def main() -> None:
         print("  " + "-" * (42 + 10 * len(headers)))
         for product in all_products:
             cols = "".join(
-                (f"{'+'if product in viable[s]['matched'] else '-':^10}")
+                (f"{'+' if product in viable[s]['matched'] else '-':^10}")
                 for s in headers
             )
             print(f"  {product:<42} {cols}")
@@ -176,11 +144,10 @@ def main() -> None:
         else:
             print(
                 f"  {strategy:<10}  {r['size_kb']:>7.1f} KB"
-                f"   {len(r['lines']):>3} OCR lines"
+                f"   {len(r['units']):>3} units"
                 f"   {len(r['matched']):>2} products matched"
             )
 
-    # Diff JPEG strategies against each other (PNG may not be viable)
     if "jpeg-95" in viable and "jpeg-85" in viable:
         lost = viable["jpeg-95"]["matched"] - viable["jpeg-85"]["matched"]
         gained = viable["jpeg-85"]["matched"] - viable["jpeg-95"]["matched"]

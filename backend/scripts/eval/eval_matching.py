@@ -1,48 +1,41 @@
 #!/usr/bin/env python3
-"""
-Benchmark rapidfuzz scorer combinations against the product catalog.
+"""Benchmark rapidfuzz scorers/cutoffs against the catalog — FALSE-POSITIVE-FIRST.
 
-Suite A: hardcoded text test cases — no AWS calls, runs instantly.
-Suite B: your own photos via manifest.json — calls AWS once per image,
-         then caches; subsequent runs are instant.
+A false positive (matching the WRONG product) silently corrupts inventory and erodes
+trust; a miss is a cheap human follow-up. So scorers are ranked by false positives first,
+recall only as a tiebreaker, and every accepted match reports its margin (top-1 minus
+top-2) — a thin margin is a false positive waiting to happen.
+
+This calls production matching (`match_text` over `get_match_units`) via harness.py, so it
+can never diverge from what production runs.
 
 Usage:
     cd backend
-    python scripts/eval/eval_matching.py
+    python scripts/eval/eval_matching.py            # full run (calls AWS for uncached images, then caches)
+    python scripts/eval/eval_matching.py --no-aws   # cached + text/negative cases only, no AWS
 
-To add image test cases:
-    1. Drop photos into scripts/eval/images/
-    2. Edit scripts/eval/manifest.json with expected product names
-       (use the canonical "name" field from products.json)
+Add cases with scripts/eval/capture.py or by editing scripts/eval/dataset.json.
 """
 
-import hashlib
-import json
-import sys
-from pathlib import Path
+import argparse
 
-SCRIPT_DIR = Path(__file__).parent
-BACKEND_DIR = SCRIPT_DIR.parent.parent
-sys.path.insert(0, str(BACKEND_DIR))
+from rapidfuzz import fuzz
 
-from dotenv import load_dotenv
+from harness import (
+    build_cases,
+    catalog_version,
+    evaluate,
+    load_catalog,
+    load_dataset,
+    pipeline_version,
+    rank,
+)
 
-load_dotenv(BACKEND_DIR / ".env")
-
-from rapidfuzz import fuzz, process
-
-from app.services.image_processor import prepare_image
-from app.services.rekognition import get_ocr_lines
-
-PRODUCTS_PATH = BACKEND_DIR / "products.json"
-CACHE_DIR = SCRIPT_DIR / "cache"
-MANIFEST_PATH = SCRIPT_DIR / "manifest.json"
-CUTOFF = 80.0
-
+# Production currently uses fuzz.partial_ratio at cutoff 80.
 SCORERS = {
-    "WRatio (current)": fuzz.WRatio,
+    "partial_ratio (current)": fuzz.partial_ratio,
+    "WRatio": fuzz.WRatio,
     "ratio": fuzz.ratio,
-    "partial_ratio": fuzz.partial_ratio,
     "token_sort_ratio": fuzz.token_sort_ratio,
     "token_set_ratio": fuzz.token_set_ratio,
     "token_ratio": fuzz.token_ratio,
@@ -50,221 +43,121 @@ SCORERS = {
     "partial_token_set_ratio": fuzz.partial_token_set_ratio,
 }
 
-# Noisy/partial OCR variants — add more as you discover real failure cases.
-# Format: (ocr_text_as_rekognition_would_return_it, expected_canonical_product_name)
-NOISY_CASES: list[tuple[str, str]] = [
-    ("RING YEAST-RAISED DONUT", "Ring Donut"),  # dropped "READY TO FINISH"
-    ("READY RING YEAST RAISED DONUT", "Ring Donut"),  # shuffled, dropped hyphen
-    ("READY T0 FINISH RING YEAST-RAIS3D DONUT", "Ring Donut"),  # OCR noise: 0/3
-]
+PRODUCTION_CUTOFF = 80.0
+CUTOFF_SWEEP = [70, 75, 80, 85, 90, 95]
 
 
-# ---------------------------------------------------------------------------
-# Catalog helpers
-# ---------------------------------------------------------------------------
+def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--no-aws",
+        action="store_true",
+        help="skip images without cached OCR (no AWS calls)",
+    )
+    args = parser.parse_args()
+    allow_aws = not args.no_aws
 
+    labeled, _ = load_catalog()
+    dataset = load_dataset()
+    cases, skipped = build_cases(dataset, allow_aws=allow_aws)
 
-def load_catalog() -> tuple[list[tuple[str, str]], list[str], dict[str, str]]:
-    data = json.loads(PRODUCTS_PATH.read_text())
-    labeled = [(p["name"], p["label"]) for p in data if p.get("label")]
-    labels = [label for _, label in labeled]
-    name_by_label = {label: name for name, label in labeled}
-    return labeled, labels, name_by_label
-
-
-def match_line(ocr_text: str, labels: list[str], scorer) -> tuple[str | None, float]:
-    if sum(c.isalnum() for c in ocr_text) < 3:
-        return None, 0.0
-    result = process.extractOne(ocr_text, labels, scorer=scorer, score_cutoff=CUTOFF)
-    if result:
-        return result[0], result[1]
-    return None, 0.0
-
-
-def match_lines(
-    ocr_lines: list[str],
-    labels: list[str],
-    name_by_label: dict[str, str],
-    scorer,
-) -> set[str]:
-    matched: set[str] = set()
-    for line in ocr_lines:
-        label, _ = match_line(line, labels, scorer)
-        if label:
-            matched.add(name_by_label[label])
-    return matched
-
-
-# ---------------------------------------------------------------------------
-# OCR cache
-# ---------------------------------------------------------------------------
-
-
-def _cache_path(image_path: Path) -> Path:
-    h = hashlib.md5(image_path.read_bytes()).hexdigest()
-    return CACHE_DIR / f"{h}.json"
-
-
-def get_cached_ocr(image_path: Path) -> list[str] | None:
-    CACHE_DIR.mkdir(exist_ok=True)
-    cp = _cache_path(image_path)
-    return json.loads(cp.read_text()) if cp.exists() else None
-
-
-def save_cached_ocr(image_path: Path, lines: list[str]) -> None:
-    CACHE_DIR.mkdir(exist_ok=True)
-    _cache_path(image_path).write_text(json.dumps(lines))
-
-
-# ---------------------------------------------------------------------------
-# Suite A: text cases
-# ---------------------------------------------------------------------------
-
-
-def run_suite_a(
-    labeled: list[tuple[str, str]],
-    labels: list[str],
-    name_by_label: dict[str, str],
-) -> tuple[dict[str, int], int]:
-    print("\n" + "=" * 72)
-    print("SUITE A  —  text cases (no AWS)")
-    print("=" * 72)
-
-    # Auto-generate exact-label cases from the catalog (first 15 labeled products)
-    exact_cases: list[tuple[str, str]] = [(label, name) for name, label in labeled[:15]]
-    all_cases = exact_cases + NOISY_CASES
-    total = len(all_cases)
-
-    scorer_passes: dict[str, int] = {}
-
-    for scorer_name, scorer in SCORERS.items():
-        passes = 0
-        rows = []
-        for ocr_text, expected_name in all_cases:
-            matched_label, score = match_line(ocr_text, labels, scorer)
-            got_name = name_by_label.get(matched_label or "") or None
-            ok = got_name == expected_name
-            passes += ok
-            rows.append((ok, ocr_text, expected_name, got_name or "(no match)", score))
-
-        scorer_passes[scorer_name] = passes
-        print(f"\n  [{scorer_name}]  {passes}/{total}")
-        for ok, ocr, expected, got, score in rows:
-            mark = "✓" if ok else "✗"
-            print(f"    {mark} {ocr[:46]:<47} → {got[:32]:<33} [{score:.0f}%]")
-
-    return scorer_passes, total
-
-
-# ---------------------------------------------------------------------------
-# Suite B: image cases
-# ---------------------------------------------------------------------------
-
-
-def run_suite_b(
-    labels: list[str],
-    name_by_label: dict[str, str],
-) -> tuple[dict[str, int], int]:
-    if not MANIFEST_PATH.exists():
-        print("\nSuite B: manifest.json not found — skipping.")
-        return {}, 0
-
-    manifest: list[dict] = json.loads(MANIFEST_PATH.read_text())
-    if not manifest:
-        print(
-            "\nSuite B: manifest.json is empty — add images and expected products to run."
-        )
-        return {}, 0
-
-    print("\n" + "=" * 72)
-    print("SUITE B  —  image cases (AWS / cached)")
-    print("=" * 72)
-
-    # Fetch/cache OCR lines for each image
-    image_data: list[tuple[str, list[str], list[str]]] = []
-    for entry in manifest:
-        img_path = SCRIPT_DIR / entry["file"]
-        if not img_path.exists():
-            print(f"  WARNING: {entry['file']} not found — skipping")
-            continue
-        lines = get_cached_ocr(img_path)
-        if lines is None:
-            print(f"  Calling AWS for {img_path.name}...")
-            image_bytes = prepare_image(img_path.read_bytes())
-            lines = get_ocr_lines(image_bytes)
-            save_cached_ocr(img_path, lines)
-            print(f"    cached {len(lines)} OCR line(s): {lines}")
-        else:
-            print(f"  {img_path.name}: {len(lines)} line(s) from cache")
-        image_data.append((img_path.name, lines, entry["expected"]))
-
-    if not image_data:
-        return {}, 0
-
-    total_products = sum(len(exp) for _, _, exp in image_data)
-    scorer_passes: dict[str, int] = {}
-
-    for scorer_name, scorer in SCORERS.items():
-        passes = 0
-        print(f"\n  [{scorer_name}]")
-        for filename, ocr_lines, expected_names in image_data:
-            matched = match_lines(ocr_lines, labels, name_by_label, scorer)
-            for expected in expected_names:
-                ok = expected in matched
-                passes += ok
-                print(f"    {'✓' if ok else '✗'}  {filename:<28} expected: {expected}")
-        print(f"  Score: {passes}/{total_products}")
-        scorer_passes[scorer_name] = passes
-
-    return scorer_passes, total_products
-
-
-# ---------------------------------------------------------------------------
-# Summary
-# ---------------------------------------------------------------------------
-
-
-def print_summary(
-    suite_a: dict[str, int],
-    total_a: int,
-    suite_b: dict[str, int],
-    total_b: int,
-) -> None:
-    print("\n" + "=" * 72)
-    print("SUMMARY")
-    print(f"  {'Scorer':<30} {'Suite A':>12} {'Suite B':>12} {'Total':>12}")
-    print("  " + "-" * 68)
-
-    rows = []
-    for name in SCORERS:
-        a = suite_a.get(name, 0)
-        b = suite_b.get(name, 0)
-        rows.append((name, a, b, a + b))
-    rows.sort(key=lambda r: r[3], reverse=True)
-
-    grand_total = total_a + total_b
-    for i, (name, a, b, total) in enumerate(rows):
-        a_str = f"{a}/{total_a}" if total_a else "n/a"
-        b_str = f"{b}/{total_b}" if total_b else "n/a"
-        t_str = f"{total}/{grand_total}"
-        best = " ← best" if i == 0 else ""
-        print(f"  {name:<30} {a_str:>12} {b_str:>12} {t_str:>12}{best}")
-
-    print()
-    if rows:
-        winner = rows[0][0].replace(" (current)", "")
-        print(f"  To apply: set `_SCORER = fuzz.{winner}` in rekognition.py")
+    print(
+        f"Catalog: {len(labeled)} labeled products (products.json v{catalog_version()})"
+    )
+    print(f"OCR pipeline version: {pipeline_version()}")
+    print(f"Cases: {len(cases)} usable", end="")
+    if skipped:
+        print(f"  ({len(skipped)} image(s) skipped — no cached OCR: {skipped})")
+    else:
         print()
 
+    n_exhaustive = sum(1 for c in cases if c.exhaustive)
+    print(
+        f"False positives measured on {n_exhaustive} exhaustive case(s); "
+        f"recall measured on all."
+    )
 
-# ---------------------------------------------------------------------------
-# Entry point
-# ---------------------------------------------------------------------------
+    # ---- Main table: all scorers at the production cutoff, ranked FP-first ----
+    results = [
+        evaluate(cases, labeled, scorer=s, scorer_name=n, cutoff=PRODUCTION_CUTOFF)
+        for n, s in SCORERS.items()
+    ]
+    ranked = rank(results)
+
+    print("\n" + "=" * 72)
+    print(
+        f"SCORERS @ cutoff {PRODUCTION_CUTOFF:.0f}  (ranked: fewest false positives, then recall)"
+    )
+    print("=" * 72)
+    print(f"  {'scorer':<26}{'false pos':>10}{'recall':>14}")
+    print("  " + "-" * 50)
+    for r in ranked:
+        flag = "  <- FP!" if r.total_fp else ""
+        recall_str = f"{r.found}/{r.expected_total} = {r.recall:.0%}"
+        print(f"  {r.scorer_name:<26}{r.total_fp:>10}{recall_str:>14}{flag}")
+
+    # ---- The false positives themselves (the silent-corruption list) ----
+    print("\n  False positives (wrong product confidently matched):")
+    any_fp = False
+    for r in ranked:
+        for c in r.cases:
+            for name, score, margin in c.false_positives:
+                any_fp = True
+                print(
+                    f"    [{r.scorer_name}] {c.name[:34]:<34} -> "
+                    f"'{name}' [{score:.0f}%, margin {margin:.1f}]"
+                )
+    if not any_fp:
+        print("    none")
+
+    # ---- Fragile correct matches (thin margin = future FP risk) ----
+    best = ranked[0]
+    thin = [(c.name, t) for c in best.cases for t in c.thin_matches]
+    print(f"\n  Fragile matches for best scorer ({best.scorer_name}, margin < 5):")
+    if thin:
+        for cname, (name, score, margin) in thin:
+            print(
+                f"    {cname[:34]:<34} -> '{name}' [{score:.0f}%, margin {margin:.1f}]"
+            )
+    else:
+        print("    none")
+
+    # ---- Cutoff sweep for the top scorers (cutoff is the dominant FP dial) ----
+    print("\n" + "=" * 72)
+    print("CUTOFF SWEEP  (false_pos / recall per cutoff)")
+    print("=" * 72)
+    top_names = [r.scorer_name for r in ranked[:3]]
+    header = "  {:<26}".format("scorer") + "".join(f"{c:>10}" for c in CUTOFF_SWEEP)
+    print(header)
+    print("  " + "-" * (24 + 10 * len(CUTOFF_SWEEP)))
+    for name in top_names:
+        cells = []
+        for cut in CUTOFF_SWEEP:
+            r = evaluate(
+                cases, labeled, scorer=SCORERS[name], scorer_name=name, cutoff=cut
+            )
+            cells.append(f"{r.total_fp}/{r.recall:.0%}")
+        print(f"  {name:<26}" + "".join(f"{c:>10}" for c in cells))
+
+    # ---- Recommendation: lowest cutoff with zero FP and best recall ----
+    print("\n" + "=" * 72)
+    zero_fp = [r for r in ranked if r.total_fp == 0]
+    if zero_fp:
+        winner = max(zero_fp, key=lambda r: r.recall)
+        print(
+            f"  Best zero-FP scorer @ cutoff {PRODUCTION_CUTOFF:.0f}: "
+            f"{winner.scorer_name} (recall {winner.recall:.0%})."
+        )
+        print(
+            "  Confirm against the cutoff sweep, then set "
+            f"`SCORER = fuzz.{winner.scorer_name.split()[0]}` in rekognition.py and re-baseline."
+        )
+    else:
+        print(
+            "  WARNING: every scorer produced false positives at this cutoff. Raise the cutoff."
+        )
+    print()
+
 
 if __name__ == "__main__":
-    labeled, labels, name_by_label = load_catalog()
-    print(f"Catalog: {len(labeled)} labeled products loaded")
-
-    suite_a_results, suite_a_total = run_suite_a(labeled, labels, name_by_label)
-    suite_b_results, suite_b_total = run_suite_b(labels, name_by_label)
-    print_summary(suite_a_results, suite_a_total, suite_b_results, suite_b_total)
+    main()
