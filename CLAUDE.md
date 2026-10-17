@@ -8,8 +8,8 @@ Project Theia is an inventory scanning app that uses computer vision to count pr
 
 ## Last Session
 
-**Date:** 2026-07-02  
-**Note:** Rebuilt the matching eval harness to be false-positive-first (a wrong match corrupts inventory + trust; a miss is a cheap human follow-up). Extracted shared `match_text()` / `get_match_units()` in `rekognition.py` so the eval runs production's exact code — fixing scorer drift (`eval_heic_formats` ran WRatio while prod ran partial_ratio) and a line-vs-group granularity divergence. Added `scripts/eval/harness.py` (FP-ranked metrics, match margins, cutoff sweep, pipeline-versioned cache), unified `dataset.json` with negative/out-of-catalog cases, a `capture.py` helper for frictionless case authoring, and a no-AWS pytest gate (`tests/test_eval_regression.py`) that hard-fails on any new false positive (baseline in `scripts/eval/baseline.json`). Determined `token_set_ratio` leads at 0 FP but **deferred the production scorer swap** until the dataset is bigger; ~50% recall across all scorers points at OCR/segmentation as the next suspect, not the scorer. Production behavior unchanged, 7 tests pass. Next: grow the dataset via `capture.py` (esp. out-of-catalog boxes), then re-run eval and decide on the scorer/cutoff.
+**Date:** 2026-10-16  
+**Note:** Added a tap-to-view box-crop gallery: `/scan` now crops each detected box region to `static/crops/` and returns `crop_image_urls` per item (including per-unknown-item crops); mobile `ResultsScreen` gained a `CropGalleryModal` shown on row tap. Also relocated the eval harness from `backend/scripts/eval/` to `backend/eval/` (updated `.gitignore` and the regression test's import accordingly), and renamed the stray `test_detect_labels.py` script to `run_detect_labels.py` while adding `testpaths = tests` to `pytest.ini` so pytest stops trying to collect it. Feature complete but not yet manually verified in the running app. Next: launch the app, scan a box, and confirm the crop gallery opens correctly on both web and mobile.
 
 ## Setup Commands
 
