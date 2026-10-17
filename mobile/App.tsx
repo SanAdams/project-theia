@@ -12,6 +12,7 @@ export interface InventoryItem {
   cic_code: string;
   count: number;
   barcode_image_url?: string;
+  crop_image_urls: string[];
 }
 
 export type RootStackParamList = {

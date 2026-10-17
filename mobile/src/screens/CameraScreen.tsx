@@ -26,11 +26,21 @@ function mergeResults(results: ScanResult[]): ScanResult {
     total_boxes += r.total_boxes;
     for (const item of r.items) {
       if (item.cic_code === "--") {
-        unknowns.push({ ...item });
+        unknowns.push({ ...item, crop_image_urls: [...item.crop_image_urls] });
       } else {
         const existing = map.get(item.cic_code);
-        if (existing) existing.count += item.count;
-        else map.set(item.cic_code, { ...item });
+        if (existing) {
+          existing.count += item.count;
+          existing.crop_image_urls = [
+            ...existing.crop_image_urls,
+            ...item.crop_image_urls,
+          ];
+        } else {
+          map.set(item.cic_code, {
+            ...item,
+            crop_image_urls: [...item.crop_image_urls],
+          });
+        }
       }
     }
   }

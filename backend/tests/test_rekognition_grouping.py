@@ -35,7 +35,7 @@ def test_match_from_crops_joins_lines_before_matching():
         with patch(
             "app.services.rekognition._match_product", return_value=None
         ) as mock_match:
-            with patch("app.services.rekognition._crop_region", return_value=b"crop"):
+            with patch("app.services.rekognition.crop_region", return_value=b"crop"):
                 regions = [{"Left": 0.0, "Top": 0.0, "Width": 1.0, "Height": 1.0}]
                 _match_from_crops(client, b"fake", regions)
 

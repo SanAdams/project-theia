@@ -295,7 +295,7 @@ def _find_box_regions(client, image_bytes: bytes) -> List[dict]:
     return accepted
 
 
-def _crop_region(image_bytes: bytes, bb: dict) -> bytes:
+def crop_region(image_bytes: bytes, bb: dict) -> bytes:
     """Crop a bounding box region (with padding) from image_bytes, return as JPEG bytes."""
     img = Image.open(BytesIO(image_bytes)).convert("RGB")
     w, h = img.size
@@ -315,7 +315,7 @@ def _crop_units(client, image_bytes: bytes, regions: List[dict]) -> List[str]:
     `get_match_units` so the two never diverge in granularity."""
     units = []
     for i, bb in enumerate(regions):
-        crop_bytes = _crop_region(image_bytes, bb)
+        crop_bytes = crop_region(image_bytes, bb)
         response = client.detect_text(Image={"Bytes": crop_bytes})
         lines = [
             d

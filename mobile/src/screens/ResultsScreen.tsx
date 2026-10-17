@@ -15,6 +15,7 @@ import { StackNavigationProp } from "@react-navigation/stack";
 import { Ionicons } from "@expo/vector-icons";
 import { RootStackParamList, InventoryItem } from "../../App";
 import { resolvedApiBaseUrl } from "../services/api";
+import CropGalleryModal from "../components/CropGalleryModal";
 
 type ResultsRouteProp = RouteProp<RootStackParamList, "Results">;
 type NavigationProp = StackNavigationProp<RootStackParamList, "Results">;
@@ -46,6 +47,7 @@ export default function ResultsScreen() {
 
   const [page, setPage] = useState(0);
   const listRef = useRef<FlatList<InventoryItem>>(null);
+  const [galleryItem, setGalleryItem] = useState<InventoryItem | null>(null);
 
   const pageCount = Math.max(1, Math.ceil(items.length / PAGE_SIZE));
 
@@ -91,10 +93,14 @@ export default function ResultsScreen() {
         }) => (
           <View style={styles.row}>
             <Text style={styles.rank}>{page * PAGE_SIZE + index + 1}</Text>
-            <View style={styles.productCell}>
+            <TouchableOpacity
+              style={styles.productCell}
+              disabled={item.crop_image_urls.length === 0}
+              onPress={() => setGalleryItem(item)}
+            >
               <Text style={styles.productName}>{item.name}</Text>
               <Text style={styles.cicCode}>{item.cic_code}</Text>
-            </View>
+            </TouchableOpacity>
             <View style={styles.barcodeCell}>
               {item.barcode_image_url ? (
                 <Image
@@ -156,6 +162,13 @@ export default function ResultsScreen() {
       >
         <Text style={styles.buttonText}>Scan Another</Text>
       </TouchableOpacity>
+
+      <CropGalleryModal
+        visible={!!galleryItem}
+        productName={galleryItem?.name ?? ""}
+        cropUrls={galleryItem?.crop_image_urls ?? []}
+        onClose={() => setGalleryItem(null)}
+      />
     </View>
   );
 }
