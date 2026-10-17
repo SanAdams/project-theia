@@ -13,7 +13,7 @@ import warnings
 
 import pytest
 
-from scripts.eval import harness as h
+from eval import harness as h
 
 from app.services.rekognition import MATCH_CUTOFF, SCORER
 

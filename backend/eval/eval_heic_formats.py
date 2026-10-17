@@ -22,7 +22,7 @@ from pathlib import Path
 import pillow_heif
 from PIL import Image
 
-from harness import (
+from backend.eval.harness import (
     BACKEND_DIR,
     get_cached_units,
     load_catalog,

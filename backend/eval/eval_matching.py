@@ -21,7 +21,7 @@ import argparse
 
 from rapidfuzz import fuzz
 
-from harness import (
+from backend.eval.harness import (
     build_cases,
     catalog_version,
     evaluate,

@@ -22,7 +22,7 @@ import shutil
 import sys
 from pathlib import Path
 
-from harness import DATASET_PATH, EVAL_DIR, load_dataset, save_cached_units
+from backend.eval.harness import DATASET_PATH, EVAL_DIR, load_dataset, save_cached_units
 
 from app.services.image_processor import prepare_image
 from app.services.rekognition import get_match_units
