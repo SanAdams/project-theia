@@ -20,9 +20,9 @@ def prepare_image(image_bytes: bytes) -> bytes:
     impractical). JPEG quality starts at 95 and steps down only if needed.
     """
     img = Image.open(io.BytesIO(image_bytes))
-    is_heic = img.format in _REKOGNITION_UNSUPPORTED
+    is_unsupported = img.format in _REKOGNITION_UNSUPPORTED
 
-    if not is_heic and len(image_bytes) <= MAX_BYTES:
+    if not is_unsupported and len(image_bytes) <= MAX_BYTES:
         return image_bytes  # Fast path: small, already-supported format
 
     img = img.convert("RGB")
