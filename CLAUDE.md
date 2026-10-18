@@ -8,8 +8,8 @@ Project Theia is an inventory scanning app that uses computer vision to count pr
 
 ## Last Session
 
-**Date:** 2026-10-16  
-**Note:** Added a tap-to-view box-crop gallery: `/scan` now crops each detected box region to `static/crops/` and returns `crop_image_urls` per item (including per-unknown-item crops); mobile `ResultsScreen` gained a `CropGalleryModal` shown on row tap. Also relocated the eval harness from `backend/scripts/eval/` to `backend/eval/` (updated `.gitignore` and the regression test's import accordingly), and renamed the stray `test_detect_labels.py` script to `run_detect_labels.py` while adding `testpaths = tests` to `pytest.ini` so pytest stops trying to collect it. Feature complete but not yet manually verified in the running app. Next: launch the app, scan a box, and confirm the crop gallery opens correctly on both web and mobile.
+**Date:** 2026-10-17  
+**Note:** Added 8 tests for the /scan router (backend/tests/test_inventory_router.py) with Rekognition and file output faked out, and set up a pre-commit hook that runs pytest before each commit; added httpx and pre-commit to requirements-dev.txt. All 15 tests pass. Next: confirm a failing test actually blocks a commit, then verify the crop gallery in the running app on web and mobile.
 
 ## Setup Commands
 
