@@ -1,6 +1,7 @@
 import logging
 import os
 from contextlib import asynccontextmanager
+from pathlib import Path
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -36,5 +37,18 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+@app.get("/health")
+def health():
+    """Load balancer health check. No auth, outside /api/v1."""
+    return {"status": "ok"}
+
+
 app.include_router(inventory.router, prefix="/api/v1")
-app.mount("/static", StaticFiles(directory="static"), name="static")
+# Anchored to this file so the app imports from any cwd (the pre-commit hook
+# runs pytest from the repo root).
+app.mount(
+    "/static",
+    StaticFiles(directory=Path(__file__).parent / "static"),
+    name="static",
+)
