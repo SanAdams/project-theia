@@ -33,11 +33,13 @@ class InventoryResult(BaseModel):
 
 
 @router.post("/scan", response_model=InventoryResult)
-async def scan_image(file: UploadFile = File(...)):
+def scan_image(file: UploadFile = File(...)):
+    # Plain def: FastAPI runs it in a threadpool, so blocking Rekognition calls
+    # do not stall the event loop (and /health) during a scan.
     if not file.content_type or not file.content_type.startswith("image/"):
         raise HTTPException(status_code=400, detail="File must be an image.")
 
-    raw_bytes = await file.read()
+    raw_bytes = file.file.read()
     image_bytes = prepare_image(raw_bytes)
 
     matched_products, bboxes = detect_box_labels(image_bytes)
