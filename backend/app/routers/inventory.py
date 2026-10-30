@@ -8,12 +8,10 @@ from typing import List, Optional
 from app.services.rekognition import detect_box_labels, crop_region
 from app.services.image_processor import prepare_image
 from app.services.debug_annotator import annotate_scan
+from app.services.storage import save_crop, barcode_url
 
-BARCODES_DIR = Path(__file__).parent.parent.parent / "static" / "barcodes"
 DEBUG_DIR = Path(__file__).parent.parent.parent / "static" / "debug"
-CROPS_DIR = Path(__file__).parent.parent.parent / "static" / "crops"
 MAX_DEBUG_IMAGES = 10
-MAX_CROP_IMAGES = 500
 
 router = APIRouter()
 
@@ -48,28 +46,18 @@ async def scan_image(file: UploadFile = File(...)):
 
     timestamp = None
     crop_urls_by_cic: dict[str, list[str]] = defaultdict(list)
-    unknown_crop_urls: list[str] = []
+    unknown_crop_urls: list[Optional[str]] = []
 
     if matched_products and bboxes:
         timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S_%f")
-        CROPS_DIR.mkdir(parents=True, exist_ok=True)
-        existing_crops = sorted(CROPS_DIR.glob("crop_*.jpg"))
-        # Prune before writing, accounting for how many crops this request is
-        # about to add, so this request never evicts its own new crops.
-        while (
-            len(existing_crops) + len(matched_products) > MAX_CROP_IMAGES
-            and existing_crops
-        ):
-            existing_crops.pop(0).unlink()
-
         for i, (product, bb) in enumerate(zip(matched_products, bboxes)):
             crop_bytes = crop_region(image_bytes, bb)
             filename = f"crop_{timestamp}_{i:02d}_{product.cic_code}.jpg"
-            (CROPS_DIR / filename).write_bytes(crop_bytes)
-            url = f"/static/crops/{filename}"
+            url = save_crop(filename, crop_bytes)
             if product.cic_code == "--":
+                # Keep the slot even if the upload failed: the box still counts.
                 unknown_crop_urls.append(url)
-            else:
+            elif url:
                 crop_urls_by_cic[product.cic_code].append(url)
 
     items = [
@@ -77,11 +65,7 @@ async def scan_image(file: UploadFile = File(...)):
             name=product_map[cic].name,
             cic_code=cic,
             count=count,
-            barcode_image_url=(
-                f"/static/barcodes/{cic}.png"
-                if (BARCODES_DIR / f"{cic}.png").exists()
-                else None
-            ),
+            barcode_image_url=barcode_url(cic),
             crop_image_urls=crop_urls_by_cic.get(cic, []),
         )
         for cic, count in sorted(counts.items())
@@ -92,7 +76,7 @@ async def scan_image(file: UploadFile = File(...)):
             cic_code="--",
             count=1,
             barcode_image_url=None,
-            crop_image_urls=[url],
+            crop_image_urls=[url] if url else [],
         )
         for url in unknown_crop_urls
     ]
