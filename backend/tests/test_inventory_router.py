@@ -116,3 +116,48 @@ def test_old_crops_pruned_but_new_ones_kept(client, monkeypatch):
     assert len(urls) == 2
     assert all((crops / u.rsplit("/", 1)[1]).exists() for u in urls)
     assert len(list(crops.glob("crop_*.jpg"))) <= 3
+
+
+def test_health_answers_while_scan_is_running(client, monkeypatch):
+    """A slow (blocking) scan must not stall the event loop, or the load
+    balancer's /health checks would fail mid-scan."""
+    import asyncio
+    import time
+
+    import httpx
+
+    def slow_detect(img):
+        time.sleep(1)  # blocking, like the real synchronous Rekognition calls
+        return [DONUT], [BBOX]
+
+    monkeypatch.setattr(inventory, "detect_box_labels", slow_detect)
+    app = client.app
+    app.get("/health")(lambda: {"status": "ok"})
+
+    async def run():
+        transport = httpx.ASGITransport(app=app)
+        async with httpx.AsyncClient(transport=transport, base_url="http://test") as ac:
+            start = time.monotonic()
+            finished = {}
+
+            async def scan():
+                resp = await ac.post(
+                    "/api/v1/scan",
+                    files={"file": ("box.jpg", b"fake-bytes", "image/jpeg")},
+                )
+                finished["scan"] = time.monotonic() - start
+                return resp
+
+            async def health():
+                await asyncio.sleep(0.2)  # let the scan get going first
+                resp = await ac.get("/health")
+                finished["health"] = time.monotonic() - start
+                return resp
+
+            scan_resp, health_resp = await asyncio.gather(scan(), health())
+            return scan_resp, health_resp, finished
+
+    scan_resp, health_resp, finished = asyncio.run(run())
+    assert scan_resp.status_code == 200
+    assert health_resp.status_code == 200
+    assert finished["health"] < finished["scan"]
