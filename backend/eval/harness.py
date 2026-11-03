@@ -103,6 +103,8 @@ def save_cached_units(image_bytes: bytes, units: list[str]) -> None:
 def units_for_image(image_path: Path, *, allow_aws: bool) -> Optional[list[str]]:
     """Return production match-units for an image. Uses cache; only calls AWS when
     allow_aws is True (the pytest gate runs with allow_aws=False, so it never bills)."""
+    if not image_path.exists():
+        return None  # photos are gitignored; absent on a fresh clone
     image_bytes = image_path.read_bytes()
     cached = get_cached_units(image_bytes)
     if cached is not None:

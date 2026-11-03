@@ -15,7 +15,8 @@
   },
   {
     "name": "Shell Donut",
-    "CIC Code": "94980403"
+    "CIC Code": "94980403",
+    "label": "Ready To Finish Shell Donut"
   },
   {
     "name": "Twist Donut",
@@ -55,8 +56,9 @@
     "CIC Code": "94986788"
   },
   {
-    "name": "Variety Cake Donut 12ct",
-    "CIC Code": "94991294"
+    "name": "Jumbo Variety Cake Donut 12ct",
+    "CIC Code": "94991294",
+    "label": "UL 6-12ct Jumbo Variety"
   },
   {
     "name": "(Franz) Old Fashioned Donut 12ct",
@@ -182,7 +184,12 @@
   },
   {
     "name": "Schwartz Brothers Lemon Blueberry Scone",
-    "CIC Code": "94986052"
+    "CIC Code": "94986052",
+    "label": "Lemon Blueberry Scones"
+  },
+  {
+    "name": "Mini Rainbow Chip Cookies",
+    "label": "Mini Rainbow Chip"
   },
   {
     "name": "Apple Turnovers",
@@ -215,11 +222,13 @@
   },
   {
     "name": "Apple Bear Claw",
-    "CIC Code": "94984956"
+    "CIC Code": "94984956",
+    "label": "3.7OZ Danish Apple Bear Claw"
   },
   {
     "name": "Bavarian Crème Bear Claw",
-    "CIC Code": "94988462"
+    "CIC Code": "94988462",
+    "label": "3.7OZ Danish Bavarian Crème Bear Claw"
   },
   {
     "name": "Honey Wheat Wide Pan Sliced",
@@ -260,7 +269,7 @@
     "CIC Code": "95151971"
   },
   {
-    "name": "Chocolate Chip Cookie Dough",
+    "name": "Chocolate Chip Cookie Dough 1oz",
     "CIC Code": "94987417",
     "label": "1oz Chocolate Chip Cookie Dough"
   },
@@ -270,7 +279,7 @@
     "label": "1oz Chocolate Chip with Mini Colored Pieces Cookie Dough"
   },
   {
-    "name": "Sugar Cookie Dough",
+    "name": "Sugar Cookie Dough 1oz",
     "CIC Code": "94984440",
     "label": "1oz Sugar Cookie Dough"
   },
@@ -285,12 +294,14 @@
     "label": "1oz Cowboy Cookie Dough"
   },
   {
-    "name": "Brownie Cookie Dough",
-    "CIC Code": "94988442"
+    "name": "Brownie Cookie Dough 1oz",
+    "CIC Code": "94988442",
+    "label": "Brownie Milk Chocolate Chip Cookie Dough"
   },
   {
-    "name": "Lemon Cookie Dough",
-    "CIC Code": "94982437"
+    "name": "Lemon Cookie Dough 1 oz",
+    "CIC Code": "94982437",
+    "label": "1.0 oz Lemon Flavored Cookie"
   },
   {
     "name": "Carrot Sandwich Cookies",
@@ -336,14 +347,6 @@
     "label": "Cranberry  RaisinOatmeal Frozen Cookie Dough Bakery Department"
   },
   {
-    "name": "TWO-BITE BROWNIE SNACK PACKS",
-    "CIC Code": "95100354"
-  },
-  {
-    "name": "TWO-BITE COOKIES SPRING SHAPED SUGAR",
-    "CIC Code": "95105696"
-  },
-  {
     "name": "(Dutch) Caramel Apple Crumble",
     "CIC Code": "94981502"
   },
@@ -379,8 +382,9 @@
     "CIC Code": "94011053"
   },
   {
-    "name": "Macaroon Cookies",
-    "CIC Code": "94981494"
+    "name": "Macaroon Cookie Dough",
+    "CIC Code": "94981494",
+    "label": "1 oz Coconute Macaroon Cookie Dough with Natural and Artificial Flavor"
   },
   {
     "name": "Susan Cookies",
@@ -388,7 +392,8 @@
   },
   {
     "name": "Star Spritz Cookies",
-    "CIC Code": "94987158"
+    "CIC Code": "94987158",
+    "label": "0.7 oz Star Spritz Cookie Dough Individual Wire Cut Pieces"
   },
   {
     "name": "Ciabatta Toscana Par-baked Bread",
@@ -401,7 +406,8 @@
   },
   {
     "name": "Kalamata Green Olive Par-baked Bread",
-    "CIC Code": "94989344"
+    "CIC Code": "94989344",
+    "label": "Kalamata & Green Olive Loaf"
   },
   {
     "name": "Roasted Garlic Cheese Par-baked Bread",
@@ -415,7 +421,8 @@
   },
   {
     "name": "Sundried Tomato Par-baked Bread",
-    "CIC Code": "94989455"
+    "CIC Code": "94989455",
+    "label": "Sundried Tomato Loaf"
   },
   {
     "name": "Izzio San Francisco Sourdough Bread",
@@ -481,11 +488,13 @@
   },
   {
     "name": "(French) Hard Rolls",
-    "CIC Code": "94987394"
+    "CIC Code": "94987394",
+    "label": "Signature Select Hard Roll Dough"
   },
   {
     "name": "Potato Rolls (Gonnella)",
-    "CIC Code": "94980034"
+    "CIC Code": "94980034",
+    "label": "Potato Roll"
   },
   {
     "name": "CCF Wheat Rolls",
@@ -565,7 +574,8 @@
   },
   {
     "name": "St.Pierre Brioche Butter Waffles",
-    "CIC Code": "95151069"
+    "CIC Code": "95151069",
+    "label": "Belgian Waffle With Butter"
   },
   {
     "name": "ST.PIERRE ROLLS PRETZEL BRIOCHE 6 CT",
@@ -682,7 +692,7 @@
     "CIC Code": "95022363"
   },
   {
-    "name": "Frosted Cinnamon Rolls",
+    "name": "Schwartz Brothers Frosted Cinnamon Rolls",
     "CIC Code": "95022369"
   },
   {
@@ -691,7 +701,7 @@
     "label": "Assorted Fruit Danish"
   },
   {
-    "name": "SCHWARTZ BROTHERS BISCUITS",
+    "name": "Schwartz Brothers Sweet Biscuit",
     "CIC Code": "95150735",
     "label": "Shortcake Sweet Biscuits"
   },
@@ -700,17 +710,13 @@
     "CIC Code": "94012492"
   },
   {
-    "name": "Stonefire Pizza Crust Naan",
-    "CIC Code": "94012728",
-    "label": "8.5\" Original Thin Pizza Crust"
+    "name": "Stonefire Mini Garlic Naan 4Pk",
+    "CIC Code": "",
+    "label": "Roasted Garlic Mini Naan 4PK"
   },
   {
     "name": "Stonefire Original Naan Rounds",
     "CIC Code": "94012692"
-  },
-  {
-    "name": "Stonefire Caramelized Onion Naan Rounds",
-    "CIC Code": "94012701"
   },
   {
     "name": "Take and Bake Roasted Garlic Loaf",
@@ -1031,10 +1037,6 @@
   {
     "name": "Salt",
     "CIC Code": "94980854"
-  },
-  {
-    "name": "Olive Oil Extra Virgin",
-    "CIC Code": "94980400"
   },
   {
     "name": "Coating Sugar",
@@ -1734,18 +1736,6 @@
   {
     "name": "Hero Seeded Bread",
     "CIC Code": "96150396"
-  },
-  {
-    "name": "OZERY BAKERY ROUNDS MORNING BLUEBERRY",
-    "CIC Code": "96100226"
-  },
-  {
-    "name": "MORNING CRNBRY ORNG",
-    "CIC Code": "96100229"
-  },
-  {
-    "name": "OZERY BAKERY ROUNDS MORNING APPLE",
-    "CIC Code": "96100227"
   },
   {
     "name": "Lemon Poppy Muffins",
