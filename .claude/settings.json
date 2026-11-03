@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/scripts/claude-hooks/require_worktree.py\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

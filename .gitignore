@@ -31,8 +31,9 @@ web-build/
 # AWS
 .aws/
 
-# Claude Code
-.claude/
+# Claude Code (local files stay private; the shared hook config is tracked)
+.claude/*
+!.claude/settings.json
 
 # Misc
 backend/tests/test_images/
