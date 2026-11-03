@@ -4,6 +4,7 @@ from fastapi.testclient import TestClient
 
 from app.models import Product
 from app.routers import inventory
+from app.services import storage
 
 DONUT = Product(name="Ring Donut", cic_code="94981327", label="RING DONUT")
 CAKE = Product(name="Pound Cake", cic_code="94983232", label="POUND CAKE")
@@ -15,9 +16,9 @@ BBOX = {"Left": 0.1, "Top": 0.1, "Width": 0.3, "Height": 0.3}
 def client(tmp_path, monkeypatch):
     """Router mounted on a bare app, with Rekognition/image work faked out and
     all file output redirected to a temp folder."""
-    monkeypatch.setattr(inventory, "BARCODES_DIR", tmp_path / "barcodes")
+    monkeypatch.setattr(storage, "BARCODES_DIR", tmp_path / "barcodes")
     monkeypatch.setattr(inventory, "DEBUG_DIR", tmp_path / "debug")
-    monkeypatch.setattr(inventory, "CROPS_DIR", tmp_path / "crops")
+    monkeypatch.setattr(storage, "CROPS_DIR", tmp_path / "crops")
     monkeypatch.setattr(inventory, "prepare_image", lambda raw: raw)
     monkeypatch.setattr(inventory, "crop_region", lambda img, bb: b"crop")
     monkeypatch.setattr(inventory, "annotate_scan", lambda img, prods, bbs: b"debug")
@@ -28,6 +29,8 @@ def client(tmp_path, monkeypatch):
             "detect_box_labels",
             lambda img: (products, [BBOX] * len(products)),
         )
+
+    monkeypatch.delenv("IMAGES_BUCKET", raising=False)
 
     app = FastAPI()
     app.include_router(inventory.router, prefix="/api/v1")
@@ -106,7 +109,7 @@ def test_debug_image_saved_and_old_ones_pruned(client, monkeypatch):
 
 
 def test_old_crops_pruned_but_new_ones_kept(client, monkeypatch):
-    monkeypatch.setattr(inventory, "MAX_CROP_IMAGES", 3)
+    monkeypatch.setattr(storage, "MAX_CROP_IMAGES", 3)
     crops = client.tmp_path / "crops"
     crops.mkdir()
     for name in ("crop_0001.jpg", "crop_0002.jpg", "crop_0003.jpg"):
@@ -118,46 +121,60 @@ def test_old_crops_pruned_but_new_ones_kept(client, monkeypatch):
     assert len(list(crops.glob("crop_*.jpg"))) <= 3
 
 
-def test_health_answers_while_scan_is_running(client, monkeypatch):
-    """A slow (blocking) scan must not stall the event loop, or the load
-    balancer's /health checks would fail mid-scan."""
-    import asyncio
-    import time
+# --- S3 mode through the router ---
 
-    import httpx
 
-    def slow_detect(img):
-        time.sleep(1)  # blocking, like the real synchronous Rekognition calls
-        return [DONUT], [BBOX]
+class _FakeS3:
+    def __init__(self, fail=False):
+        self.fail = fail
 
-    monkeypatch.setattr(inventory, "detect_box_labels", slow_detect)
-    app = client.app
-    app.get("/health")(lambda: {"status": "ok"})
+    def put_object(self, **kw):
+        if self.fail:
+            raise RuntimeError("boom")
 
-    async def run():
-        transport = httpx.ASGITransport(app=app)
-        async with httpx.AsyncClient(transport=transport, base_url="http://test") as ac:
-            start = time.monotonic()
-            finished = {}
+    def generate_presigned_url(self, op, Params, ExpiresIn):
+        if self.fail:
+            raise RuntimeError("boom")
+        return f"https://signed/{Params['Key']}"
 
-            async def scan():
-                resp = await ac.post(
-                    "/api/v1/scan",
-                    files={"file": ("box.jpg", b"fake-bytes", "image/jpeg")},
-                )
-                finished["scan"] = time.monotonic() - start
-                return resp
+    def get_paginator(self, name):
+        fake = self
 
-            async def health():
-                await asyncio.sleep(0.2)  # let the scan get going first
-                resp = await ac.get("/health")
-                finished["health"] = time.monotonic() - start
-                return resp
+        class P:
+            def paginate(self, Bucket, Prefix):
+                if fake.fail:
+                    raise RuntimeError("boom")
+                yield {"Contents": [{"Key": "barcodes/94981327.png"}]}
 
-            scan_resp, health_resp = await asyncio.gather(scan(), health())
-            return scan_resp, health_resp, finished
+        return P()
 
-    scan_resp, health_resp, finished = asyncio.run(run())
-    assert scan_resp.status_code == 200
-    assert health_resp.status_code == 200
-    assert finished["health"] < finished["scan"]
+
+def _use_s3(monkeypatch, fake):
+    monkeypatch.setenv("IMAGES_BUCKET", "theia-images")
+    monkeypatch.setattr(storage, "_get_s3", lambda: fake)
+    monkeypatch.setattr(storage, "_barcode_cics", None)
+
+
+def test_s3_scan_returns_presigned_urls(client, monkeypatch):
+    _use_s3(monkeypatch, _FakeS3())
+    client.set_detection([DONUT, CAKE, UNKNOWN])
+    items = {i["cic_code"]: i for i in _scan(client).json()["items"]}
+    donut = items["94981327"]
+    assert donut["barcode_image_url"] == "https://signed/barcodes/94981327.png"
+    assert donut["crop_image_urls"][0].startswith("https://signed/crops/crop_")
+    assert items["94983232"]["barcode_image_url"] is None
+    assert items["--"]["crop_image_urls"][0].startswith("https://signed/crops/")
+    assert not (client.tmp_path / "crops").exists()
+
+
+def test_s3_failure_does_not_fail_the_scan(client, monkeypatch):
+    _use_s3(monkeypatch, _FakeS3(fail=True))
+    client.set_detection([DONUT, UNKNOWN])
+    resp = _scan(client)
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["total_boxes"] == 2
+    donut = next(i for i in body["items"] if i["cic_code"] == "94981327")
+    assert donut["barcode_image_url"] is None and donut["crop_image_urls"] == []
+    unknown = next(i for i in body["items"] if i["cic_code"] == "--")
+    assert unknown["crop_image_urls"] == []

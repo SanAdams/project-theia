@@ -20,17 +20,27 @@ from app.services.rekognition import MATCH_CUTOFF, SCORER
 BASELINE = json.loads((h.EVAL_DIR / "baseline.json").read_text())
 
 
+MISSING_PHOTOS_HINT = (
+    "eval photos are gitignored and missing on this checkout; only the text-only "
+    "cases ran. See the 'Test data' note in CLAUDE.md to get the photos."
+)
+
+
 @pytest.fixture(scope="module")
-def production_result():
+def production_run():
     labeled, _ = h.load_catalog()
-    cases, _ = h.build_cases(h.load_dataset(), allow_aws=False)
-    return h.evaluate(
+    cases, skipped = h.build_cases(h.load_dataset(), allow_aws=False)
+    result = h.evaluate(
         cases, labeled, scorer=SCORER, scorer_name="production", cutoff=MATCH_CUTOFF
     )
+    return result, skipped
 
 
-def test_no_new_false_positives(production_result):
+def test_no_new_false_positives(production_run):
     """HARD GATE: false positives may only stay flat or shrink versus the baseline."""
+    production_result, skipped = production_run
+    if skipped:
+        warnings.warn(f"{len(skipped)} images skipped: {MISSING_PHOTOS_HINT}")
     offenders = [
         f"  {c.name}: {[(n, round(s), round(m, 1)) for n, s, m in c.false_positives]}"
         for c in production_result.cases
@@ -43,8 +53,12 @@ def test_no_new_false_positives(production_result):
     )
 
 
-def test_recall_not_silently_regressed(production_result):
+def test_recall_not_silently_regressed(production_run):
     """ADVISORY: a recall drop only warns — becoming more conservative is acceptable."""
+    production_result, skipped = production_run
+    if skipped:
+        # The baseline covers every photo; comparing a partial run to it is meaningless.
+        pytest.skip(MISSING_PHOTOS_HINT)
     base = (
         BASELINE["recall_found"] / BASELINE["recall_total"]
         if BASELINE["recall_total"]
