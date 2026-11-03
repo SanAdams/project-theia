@@ -28,6 +28,23 @@ npx expo start
 
 The VS Code task **Ctrl+Shift+B** (Start Theia) launches both services sequentially, stopping any existing processes first. `backend/scripts/stop.ps1` handles the teardown.
 
+## Test data
+
+`pytest` (run from `backend/`) must pass on a fresh clone with no extra files. Unit tests build their own images in memory; do not make a test depend on a photo.
+
+The real-photo eval photos (`backend/eval/images/`) and the photo library (`backend/tests/test_images/`) are gitignored because the repo is public. Without the eval photos, `test_eval_regression.py` still runs its text-only cases, warns about the skipped photos, and skips the recall comparison. To run the full gate, copy `backend/eval/images/` in from a checkout that has it (a fetch script from S3 is planned: card A7 in `docs/deploy/TASKS.md`). `backend/tests/test_images/` is for manual experiments only.
+
+## Parallel sessions: one worktree per task
+
+Several Claude sessions may be open on this repo at once. They share the same files and git state, so never edit in the main checkout.
+
+1. At the start of a task that edits files, run `git worktree list` and `git branch --show-current`. If you are in the main checkout, do not edit there.
+2. Create your own worktree off the latest master in a sibling folder: `git fetch && git worktree add -b deploy/<card-id>-<slug> ../theia-<card-id> origin/master`. Work only inside it.
+3. Before starting a card, check nobody has it: `git branch -a` and `gh pr list`. If a branch or PR for the card exists, stop and tell the user.
+4. Never run `git checkout` or `git switch` in a folder you did not create, and never edit or revert uncommitted changes you did not make.
+5. Gitignored files (`.env`, eval photos) do not exist in a new worktree; see "Test data".
+6. When your PR is merged, remove your worktree: `git worktree remove ../theia-<card-id>`.
+
 ## Architecture
 
 ### Recognition Pipeline (`backend/app/services/rekognition.py`)

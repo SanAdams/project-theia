@@ -25,6 +25,7 @@ The code-block copy button on GitHub works well for steps 1–3.
 | F2                                    | F1 (same session)                       |
 | A1, A2                                | A0 (runbook)                            |
 | A3                                    | A0, A1 (bucket name)                    |
+| A7                                    | A1 (bucket); not on the critical path   |
 | C1                                    | B1                                      |
 | C2                                    | A0, A2, A3                              |
 | D1                                    | B1–B5 merged (F1–F2 for front-end vars) |
@@ -460,6 +461,7 @@ A3 · Create the IAM roles
 A4 · Generate the API key
 A5 · Set up an AWS Budgets alarm
 A6 · Password-protect the Amplify site
+A7 · Move the eval photos to S3 and add a fetch script
 ```
 
 ### A0 · Write the AWS console runbook and IAM policy files
@@ -628,6 +630,44 @@ Checklist
 Enable access control on master
 Verify the prompt in a private window
 Share the credentials with staff
+```
+
+### A7 · Move the eval photos to S3 and add a fetch script
+
+Labels: `Agent`, `AWS setup` · Depends on: A1 (the bucket). The upload step is yours.
+
+Description
+
+```text
+Read "Shared context" in docs/deploy/TASKS.md first.
+
+Context: the real-photo eval tests (backend/tests/test_eval_regression.py) read backend/eval/images/, which is gitignored (the repo is public and these are photos of real inventory). A fresh clone or worktree therefore doesn't have them. The tests skip with a clear message when the photos are missing (done in the test-fixtures PR). This card gives the team one command to get the photos from a private S3 bucket instead of copying folders by hand.
+
+Do:
+- backend/scripts/fetch_test_data.py with two subcommands, both using boto3 and the developer's own AWS credentials:
+  - `fetch`: download every object under the eval-data/ prefix of $IMAGES_BUCKET into backend/eval/images/ (create the folder, skip files that already exist with the same size, print a count).
+  - `upload`: the reverse, for adding new photos. Refuse to run without IMAGES_BUCKET set.
+- Same bucket as A1, new prefix eval-data/. Do NOT add eval-data/ to the task role in infrastructure/policies/task-role.json: the running service must never be able to read these photos. Do NOT give the GitHub deploy role access either: CI test jobs run without AWS credentials by design, so the eval tests skip in CI.
+- Document it in README or CLAUDE.md under the test instructions: "run `python scripts/fetch_test_data.py fetch` once after cloning, to enable the eval tests".
+- Tests: unit-test the script's logic with a fake S3 client (skip-existing, prefix handling, missing-bucket error). No real AWS calls.
+
+Files: backend/scripts/fetch_test_data.py (new), backend/tests/ (script tests), CLAUDE.md or README
+
+Done when:
+- pytest passes without AWS credentials and without the photos (eval tests skip, script tests pass).
+- With the photos uploaded, `python scripts/fetch_test_data.py fetch` fills backend/eval/images/ on a fresh clone and the eval tests then run and pass.
+```
+
+Checklist
+
+```text
+Upload backend/eval/images/* to s3://<bucket>/eval-data/ (you, with your AWS credentials)
+fetch_test_data.py with fetch and upload subcommands
+Script tests with a fake S3 client
+eval-data/ NOT added to the task role or the GitHub deploy role
+Docs: how to fetch after cloning
+Fresh worktree + fetch makes the eval tests run and pass
+PR opened and linked to this card
 ```
 
 ---
