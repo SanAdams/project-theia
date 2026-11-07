@@ -1,6 +1,6 @@
 import io
+import random
 
-import numpy as np
 import pillow_heif
 import pytest
 from PIL import Image
@@ -14,8 +14,8 @@ MAX_BYTES = 5 * 1024 * 1024
 
 def _noisy_image(width: int, height: int) -> Image.Image:
     """Random noise barely compresses, so it reliably produces large files."""
-    rng = np.random.default_rng(0)
-    return Image.fromarray(rng.integers(0, 255, (height, width, 3), dtype=np.uint8))
+    data = random.Random(0).randbytes(width * height * 3)
+    return Image.frombytes("RGB", (width, height), data)
 
 
 def _encode(img: Image.Image, fmt: str, **kwargs) -> bytes:
