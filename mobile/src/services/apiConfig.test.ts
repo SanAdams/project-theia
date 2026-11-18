@@ -2,7 +2,11 @@
 import assert from "node:assert/strict";
 import { describe, test } from "node:test";
 
-import { buildAuthHeaders, resolveWebApiBaseUrl } from "./apiConfig.ts";
+import {
+  buildAuthHeaders,
+  missingWebApiUrlWarning,
+  resolveWebApiBaseUrl,
+} from "./apiConfig.ts";
 
 const FALLBACK = "http://localhost:8000";
 
@@ -74,11 +78,56 @@ describe("resolveWebApiBaseUrl", () => {
     );
   });
 
-  test("env wins over the hostname", () => {
+  test("env is used when there is no hostname", () => {
     assert.equal(
-      resolveWebApiBaseUrl("https://api.example.com", "localhost", FALLBACK),
+      resolveWebApiBaseUrl("https://api.example.com", undefined, FALLBACK),
       "https://api.example.com",
     );
+  });
+
+  test("accepts http:// and an uppercase scheme", () => {
+    assert.equal(
+      resolveWebApiBaseUrl("http://10.0.0.2:8000", "localhost", FALLBACK),
+      "http://10.0.0.2:8000",
+    );
+    assert.equal(
+      resolveWebApiBaseUrl("HTTPS://X.COM/", "localhost", FALLBACK),
+      "HTTPS://X.COM",
+    );
+  });
+
+  test("throws when the env URL has no http(s) scheme", () => {
+    for (const bad of ["abc.us-west-2.on.aws", "//x.com", "ftp://x.com"]) {
+      assert.throws(
+        () => resolveWebApiBaseUrl(bad, "localhost", FALLBACK),
+        /EXPO_PUBLIC_WEB_API_URL must start with http:\/\/ or https:\/\//,
+        bad,
+      );
+    }
+  });
+});
+
+describe("missingWebApiUrlWarning", () => {
+  test("https page without env URL: warns", () => {
+    const msg = missingWebApiUrlWarning(undefined, "https:");
+    assert.ok(msg);
+    assert.match(msg, /EXPO_PUBLIC_WEB_API_URL/);
+  });
+
+  test("https page with blank env URL: warns", () => {
+    assert.ok(missingWebApiUrlWarning("  ", "https:"));
+  });
+
+  test("https page with env URL set: no warning", () => {
+    assert.equal(missingWebApiUrlWarning("https://x.com", "https:"), null);
+  });
+
+  test("http page (local dev) without env URL: no warning", () => {
+    assert.equal(missingWebApiUrlWarning(undefined, "http:"), null);
+  });
+
+  test("no protocol (native): no warning", () => {
+    assert.equal(missingWebApiUrlWarning(undefined, undefined), null);
   });
 });
 

@@ -2,7 +2,11 @@ import axios from "axios";
 import * as ImageManipulator from "expo-image-manipulator";
 import { Platform } from "react-native";
 import { InventoryItem } from "../../App";
-import { buildAuthHeaders, resolveWebApiBaseUrl } from "./apiConfig";
+import {
+  buildAuthHeaders,
+  missingWebApiUrlWarning,
+  resolveWebApiBaseUrl,
+} from "./apiConfig";
 
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:8000";
 
@@ -14,6 +18,14 @@ const WEB_API_BASE_URL = resolveWebApiBaseUrl(
   typeof window !== "undefined" ? window.location?.hostname : undefined,
   API_BASE_URL,
 );
+
+if (Platform.OS === "web") {
+  const warning = missingWebApiUrlWarning(
+    process.env.EXPO_PUBLIC_WEB_API_URL,
+    typeof window !== "undefined" ? window.location?.protocol : undefined,
+  );
+  if (warning) console.warn(warning);
+}
 
 // X-API-Key header when EXPO_PUBLIC_API_KEY is set; empty otherwise.
 const AUTH_HEADERS = buildAuthHeaders(process.env.EXPO_PUBLIC_API_KEY);
