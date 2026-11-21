@@ -2,17 +2,39 @@ import axios from "axios";
 import * as ImageManipulator from "expo-image-manipulator";
 import { Platform } from "react-native";
 import { InventoryItem } from "../../App";
+import {
+  buildAuthHeaders,
+  missingWebApiUrlWarning,
+  resolveWebApiBaseUrl,
+} from "./apiConfig";
 
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:8000";
 
-// On web, use the same host the browser loaded the app from (port 8000).
-// This works whether you're on localhost or accessing via IP from another device.
-const WEB_API_BASE_URL =
-  typeof window !== "undefined"
-    ? `http://${window.location.hostname}:8000`
-    : API_BASE_URL;
+// On web: EXPO_PUBLIC_WEB_API_URL when set (deployed backend), else port 8000
+// on the host the browser loaded the app from (localhost or LAN IP).
+// Read env vars literally here: Expo only inlines literal process.env.EXPO_PUBLIC_* reads.
+const WEB_API_BASE_URL = resolveWebApiBaseUrl(
+  process.env.EXPO_PUBLIC_WEB_API_URL,
+  typeof window !== "undefined" ? window.location?.hostname : undefined,
+  API_BASE_URL,
+);
 
-const client = axios.create({ baseURL: API_BASE_URL, timeout: 30_000 });
+if (Platform.OS === "web") {
+  const warning = missingWebApiUrlWarning(
+    process.env.EXPO_PUBLIC_WEB_API_URL,
+    typeof window !== "undefined" ? window.location?.protocol : undefined,
+  );
+  if (warning) console.warn(warning);
+}
+
+// X-API-Key header when EXPO_PUBLIC_API_KEY is set; empty otherwise.
+const AUTH_HEADERS = buildAuthHeaders(process.env.EXPO_PUBLIC_API_KEY);
+
+const client = axios.create({
+  baseURL: API_BASE_URL,
+  timeout: 30_000,
+  headers: AUTH_HEADERS,
+});
 
 // Resolves to the correct base URL for the current platform.
 // Use this when constructing URLs to backend assets (e.g. barcode images).
@@ -50,6 +72,7 @@ export async function scanImage(
     // Let the browser set Content-Type + boundary automatically by omitting the header.
     const res = await fetch(`${WEB_API_BASE_URL}/api/v1/scan`, {
       method: "POST",
+      headers: AUTH_HEADERS,
       body: form,
     });
     if (!res.ok) {
